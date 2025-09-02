@@ -39,11 +39,12 @@ const Preloader = ({ onComplete }) => {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex items-center justify-center transition-all duration-1000 ${
+      className={`fixed top-0 left-0 w-screen h-screen z-[9999] flex items-center justify-center transition-all duration-1000 ${
         isComplete ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
       style={{
-        background: `radial-gradient(ellipse at 50% 50%, ${COLORS.ink} 0%, ${COLORS.darkCard} 40%, ${COLORS.darkBg} 100%)`
+        background: `radial-gradient(ellipse at center, ${COLORS.ink} 0%, ${COLORS.darkCard} 40%, ${COLORS.darkBg} 100%)`,
+        minHeight: "100vh"
       }}
     >
       {/* Animated background particles */}
