@@ -77,14 +77,6 @@ import Image61 from "./../assets/Social Media Posts/lower (34).jpg";
 import Image62 from "./../assets/Social Media Posts/lower (35).jpg";
 import Image63 from "./../assets/Social Media Posts/lower (36).jpg";
 import Image64 from "./../assets/Social Media Posts/lower (37).jpg";
-import Image65 from "./../assets/Social Media Posts/lower (38).jpg";
-import Image66 from "./../assets/Social Media Posts/lower (39).jpg";
-import Image67 from "./../assets/Social Media Posts/lower (40).jpg";
-import Image68 from "./../assets/Social Media Posts/lower (41).jpg";
-import Image69 from "./../assets/Social Media Posts/lower (42).jpg";
-import Image70 from "./../assets/Social Media Posts/lower (43).jpg";
-import Image71 from "./../assets/Social Media Posts/lower (44).jpg";
-import Image72 from "./../assets/Social Media Posts/lower (45).jpg";
 import Image73 from "./../assets/Social Media Posts/lower (46).jpg";
 import Image74 from "./../assets/Social Media Posts/lower (47).jpg";
 import Image75 from "./../assets/Social Media Posts/lower (48).jpg";
@@ -443,14 +435,6 @@ const SocialMediaPostsSection = () => {
     Image62,
     Image63,
     Image64,
-    Image65,
-    Image66,
-    Image67,
-    Image68,
-    Image69,
-    Image70,
-    Image71,
-    Image72,
     Image73,
     Image74,
     Image75,
