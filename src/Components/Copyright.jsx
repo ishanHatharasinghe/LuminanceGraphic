@@ -77,7 +77,7 @@ const Copyright = ({ designerName, contactHref, homeHref }) => {
 
           <div className="text-center space-y-2">
             <h3 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#E7DFD6] via-[#B08B57] to-[#6B7785]">
-              Ishan Hatharasinghe
+              Luminance Graphic
             </h3>
             <p className="text-sm text-[#E7DFD6]/70">
               Creative Designer & Developer
