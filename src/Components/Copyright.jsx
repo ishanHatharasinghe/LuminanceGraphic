@@ -85,7 +85,7 @@ const Copyright = ({ designerName, contactHref, homeHref }) => {
                   rel="noopener noreferrer"
                   className="bg-clip-text text-transparent bg-gradient-to-r from-[#E7DFD6] via-[#B08B57] to-[#6B7785] font-semibold hover:opacity-90 transition-opacity"
                 >
-                  {designerName}
+                  Ishan Hatharasinghe
                 </a>
               </p>
             </div>
