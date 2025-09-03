@@ -59,7 +59,7 @@ const SocialIcon = ({ type, className = "w-5 h-5" }) => {
 // Reusable card for each team member
 const TeamMemberCard = ({ member, index = 0 }) => {
   return (
-    <motion.div
+    <div
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.3 }}
@@ -85,10 +85,7 @@ const TeamMemberCard = ({ member, index = 0 }) => {
               loading="lazy"
             />
           </div>
-          {/* orbit accent */}
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-            <div className="w-40 h-40 rounded-full border border-white/10 animate-[orbit_18s_linear_infinite]" />
-          </div>
+
           {/* role chip */}
           <div className="absolute left-4 top-4 px-3 py-1.5 rounded-full text-xs bg-[#0A0B0D]/70 backdrop-blur-md ring-1 ring-white/20 text-[#E7DFD6] font-medium tracking-wide shadow-lg">
             {member.role}
@@ -216,7 +213,7 @@ const TeamMemberCard = ({ member, index = 0 }) => {
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
