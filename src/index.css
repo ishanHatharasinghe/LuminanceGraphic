@@ -64,7 +64,7 @@ a:hover .tooltip {
     display: none !important;
   }
   
-  /* Reduce blur effects */
+  /* Reduce blur effects 
   .blur-3xl { filter: blur(8px) !important; }
   .blur-2xl { filter: blur(4px) !important; }
   
