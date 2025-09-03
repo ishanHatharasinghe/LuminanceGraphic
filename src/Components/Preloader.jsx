@@ -15,24 +15,6 @@ const COLORS = {
 const Preloader = ({ onComplete }) => {
   const [progress, setProgress] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    // Detect mobile device
-    const checkMobile = () => {
-      setIsMobile(
-        window.innerWidth <= 768 ||
-          /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-            navigator.userAgent
-          )
-      );
-    };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
 
   useEffect(() => {
     // Simulate loading progress
@@ -64,55 +46,32 @@ const Preloader = ({ onComplete }) => {
         background: `radial-gradient(ellipse at 50% 50%, ${COLORS.ink} 0%, ${COLORS.darkCard} 40%, ${COLORS.darkBg} 100%)`
       }}
     >
-      {/* Animated background particles - Hidden on mobile or simplified */}
-      {!isMobile && (
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-r from-[#B08B57]/10 to-[#E7DFD6]/5 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-gradient-to-r from-[#6B7785]/10 to-[#B08B57]/8 rounded-full blur-2xl animate-float-reverse" />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-[#E7DFD6]/5 to-transparent rounded-full blur-3xl animate-pulse" />
-        </div>
-      )}
-
-      {/* Mobile-friendly simplified background */}
-      {isMobile && (
-        <div className="absolute inset-0 overflow-hidden opacity-30">
-          <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-[#B08B57]/20 rounded-full animate-pulse" />
-          <div
-            className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-[#6B7785]/15 rounded-full animate-pulse"
-            style={{ animationDelay: "1s" }}
-          />
-        </div>
-      )}
+      {/* Animated background particles */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-r from-[#B08B57]/10 to-[#E7DFD6]/5 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-gradient-to-r from-[#6B7785]/10 to-[#B08B57]/8 rounded-full blur-2xl animate-float-reverse" />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-[#E7DFD6]/5 to-transparent rounded-full blur-3xl animate-pulse" />
+      </div>
 
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center space-y-8">
-        {/* Logo container with conditional animations */}
+        {/* Logo container with complex animations */}
         <div className="relative">
-          {/* Outer rotating ring - simplified for mobile */}
-          <div
-            className={`absolute -inset-8 rounded-full border border-[#B08B57]/30 ${
-              !isMobile ? "animate-spin-slow" : ""
-            }`}
-          />
+          {/* Outer rotating ring */}
+          <div className="absolute -inset-8 rounded-full border border-[#B08B57]/30 animate-spin-slow" />
 
           {/* Middle pulsing ring */}
           <div className="absolute -inset-6 rounded-full ring-1 ring-[#E7DFD6]/20 animate-pulse" />
 
-          {/* Glow effect - reduced for mobile */}
-          <div
-            className={`absolute -inset-12 bg-gradient-to-r from-[#B08B57]/20 via-[#E7DFD6]/10 to-[#6B7785]/15 rounded-full animate-pulse ${
-              isMobile ? "blur-xl opacity-50" : "blur-2xl"
-            }`}
-          />
+          {/* Glow effect */}
+          <div className="absolute -inset-12 bg-gradient-to-r from-[#B08B57]/20 via-[#E7DFD6]/10 to-[#6B7785]/15 rounded-full blur-2xl animate-pulse" />
 
           {/* Logo */}
           <div className="relative w-24 h-24 sm:w-32 sm:h-32">
             <img
               src={logo}
               alt="Loading..."
-              className={`w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(176,139,87,0.4)] ${
-                !isMobile ? "animate-float" : ""
-              }`}
+              className="w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(176,139,87,0.4)] animate-float"
               style={{
                 transform: `scale(${0.8 + (progress / 100) * 0.2})`
               }}
@@ -138,27 +97,19 @@ const Preloader = ({ onComplete }) => {
             </div>
 
             {/* Progress bar container */}
-            <div
-              className={`relative h-1 bg-white/10 rounded-full overflow-hidden ${
-                !isMobile ? "backdrop-blur-sm" : ""
-              }`}
-            >
+            <div className="relative h-1 bg-white/10 rounded-full overflow-hidden backdrop-blur-sm">
               {/* Progress fill */}
               <div
                 className="absolute left-0 top-0 h-full bg-gradient-to-r from-[#B08B57] via-[#E7DFD6] to-[#B08B57] rounded-full transition-all duration-300 ease-out"
                 style={{ width: `${progress}%` }}
               >
-                {/* Animated shine effect - only on desktop */}
-                {!isMobile && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shine" />
-                )}
+                {/* Animated shine effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shine" />
               </div>
 
-              {/* Glow effect - simplified for mobile */}
+              {/* Glow effect */}
               <div
-                className={`absolute top-1/2 transform -translate-y-1/2 h-3 bg-[#B08B57]/30 rounded-full transition-all duration-300 ${
-                  isMobile ? "opacity-50" : "blur-sm"
-                }`}
+                className="absolute top-1/2 transform -translate-y-1/2 h-3 bg-[#B08B57]/30 blur-sm rounded-full transition-all duration-300"
                 style={{
                   width: `${progress}%`,
                   left: 0
@@ -212,15 +163,6 @@ const Preloader = ({ onComplete }) => {
         .animate-float-reverse { animation: float-reverse 7s ease-in-out infinite; }
         .animate-spin-slow { animation: spin-slow 8s linear infinite; }
         .animate-shine { animation: shine 2s ease-in-out infinite; }
-
-        /* Mobile-specific optimizations */
-        @media (max-width: 768px) {
-          .animate-float,
-          .animate-float-reverse,
-          .animate-spin-slow {
-            animation: none;
-          }
-        }
       `}</style>
     </div>
   );

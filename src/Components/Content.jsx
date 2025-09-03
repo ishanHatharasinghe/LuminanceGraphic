@@ -160,7 +160,7 @@ const Content = () => {
       />
       {/* Header */}
       <div className="relative max-w-7xl mx-auto px-6 pt-24 md:pt-32">
-        <div data-aos="fade-up">
+        <div>
           <div className="inline-flex items-center gap-3 bg-white/5 backdrop-blur-xl ring-1 ring-white/10 rounded-full px-5 py-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
             <span className="inline-block w-2 h-2 rounded-full bg-[#B08B57] shadow-[0_0_0_4px_rgba(176,139,87,0.18)]" />
             <span className="text-xs md:text-sm text-[#E7DFD6]/80 font-medium tracking-wide">
@@ -191,8 +191,6 @@ const Content = () => {
             <div
               key={s.title}
               className="group relative rounded-xl p-4 bg-white/[0.06] hover:bg-white/[0.09] backdrop-blur-xl ring-1 ring-white/10 shadow-[0_20px_70px_-20px_rgba(0,0,0,0.6)] hover:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.7)] transition-all duration-500 overflow-hidden"
-              data-aos="fade-up"
-              data-aos-delay={Math.round(s.delay * 1000)}
             >
               {/* Soft aurora inside card */}
               <div className="pointer-events-none absolute -inset-16 -z-10 opacity-70">

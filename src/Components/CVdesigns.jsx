@@ -4,8 +4,14 @@ import { useEffect, useRef, useState } from "react";
 // CV images (two 2-sided CVs)
 import cv1Front from "../assets/CV/cv1.jpg";
 import cv1Back from "../assets/CV/cv2.jpg";
+
 import cv2Front from "../assets/CV/cv3.jpg";
 import cv2Back from "../assets/CV/cv4.jpg";
+
+import cv3Front from "../assets/CV/cv5.jpg";
+import cv4Front from "../assets/CV/cv6.jpg";
+import cv5Front from "../assets/CV/cv7.jpg";
+import cv6Front from "../assets/CV/cv8.jpg";
 
 // Theme (match site)
 const COLORS = {
@@ -75,9 +81,12 @@ const CloseIcon = ({ className }) => (
 */
 const cvSets = [
   { id: "cv-001", title: "CV / Resume 1", pages: [cv1Front, cv1Back] },
-  { id: "cv-002", title: "CV / Resume 2", pages: [cv2Front, cv2Back] }
-  // Add more:
-  // { id: "cv-003", title: "CV / Resume 3", pages: [singlePageImage] }
+  { id: "cv-002", title: "CV / Resume 2", pages: [cv2Front, cv2Back] },
+
+  { id: "cv-003", title: "CV / Resume 3", pages: [cv3Front] },
+  { id: "cv-004", title: "CV / Resume 4", pages: [cv4Front] },
+  { id: "cv-005", title: "CV / Resume 5", pages: [cv5Front] },
+  { id: "cv-006", title: "CV / Resume 6", pages: [cv6Front] }
 ];
 
 const CVResumeSection = () => {
@@ -240,11 +249,7 @@ const CVResumeSection = () => {
 
       <div className="relative max-w-7xl mx-auto px-6 py-24 md:py-28">
         {/* Header */}
-        <div
-          className={`mb-10 md:mb-14 transition-all duration-1000 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-          }`}
-        >
+        <div className="mb-10 md:mb-14 transition-all duration-1000">
           <div className="inline-flex items-center gap-3 bg-white/5 backdrop-blur-xl ring-1 ring-white/10 rounded-full px-5 py-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
             <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#B08B57] shadow-[0_0_0_4px_rgba(176,139,87,0.18)]" />
             <span className="text-xs md:text-sm text-[#E7DFD6]/80 font-medium tracking-wide">

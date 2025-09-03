@@ -209,11 +209,7 @@ const YouTubeThumbnailsSection = () => {
 
       <div className="relative max-w-7xl mx-auto px-6 py-24 md:py-28">
         {/* Header */}
-        <div
-          className={`mb-10 md:mb-14 transition-all duration-1000 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-          }`}
-        >
+        <div className="mb-10 md:mb-14 transition-all duration-1000 ">
           <div className="inline-flex items-center gap-3 bg-white/5 backdrop-blur-xl ring-1 ring-white/10 rounded-full px-5 py-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
             <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#B08B57] shadow-[0_0_0_4px_rgba(176,139,87,0.18)]" />
             <span className="text-xs md:text-sm text-[#E7DFD6]/80 font-medium tracking-wide">

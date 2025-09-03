@@ -19,13 +19,33 @@ const COLORS = {
 };
 
 const ChevronLeftIcon = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M15 19l-7-7 7-7"
+    />
   </svg>
 );
 const ChevronRightIcon = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M9 5l7 7-7 7"
+    />
   </svg>
 );
 const PlayIcon = ({ className }) => (
@@ -39,7 +59,12 @@ const PauseIcon = ({ className }) => (
   </svg>
 );
 const CloseIcon = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+  >
     <path strokeWidth="2" strokeLinecap="round" d="M6 6l12 12M6 18L18 6" />
   </svg>
 );
@@ -80,7 +105,10 @@ const BookmarksSection = () => {
 
   // In-view header
   useEffect(() => {
-    const obs = new IntersectionObserver(([entry]) => setIsVisible(entry.isIntersecting), { threshold: 0.2 });
+    const obs = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.2 }
+    );
     if (sectionRef.current) obs.observe(sectionRef.current);
     return () => obs.disconnect();
   }, []);
@@ -132,7 +160,8 @@ const BookmarksSection = () => {
     setIsPlaying(false);
   };
   const next = () => setActiveIndex((i) => (i + 1) % allPosts.length);
-  const prev = () => setActiveIndex((i) => (i - 1 + allPosts.length) % allPosts.length);
+  const prev = () =>
+    setActiveIndex((i) => (i - 1 + allPosts.length) % allPosts.length);
   const select = (i) => {
     setActiveIndex(i);
     setIsPlaying(false);
@@ -161,7 +190,8 @@ const BookmarksSection = () => {
       onMouseMove={onMouseMove}
       className="relative overflow-hidden text-[#E7DFD6]"
       style={{
-        background: "radial-gradient(ellipse at 70% 10%, #1F232B 0%, #141518 40%, #0A0B0D 100%)"
+        background:
+          "radial-gradient(ellipse at 70% 10%, #1F232B 0%, #141518 40%, #0A0B0D 100%)"
       }}
     >
       {/* Cursor spotlight */}
@@ -180,11 +210,7 @@ const BookmarksSection = () => {
 
       <div className="relative max-w-7xl mx-auto px-6 py-24 md:py-28">
         {/* Header */}
-        <div
-          className={`mb-10 md:mb-14 transition-all duration-1000 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-          }`}
-        >
+        <div className="mb-10 md:mb-14 transition-all duration-1000">
           <div className="inline-flex items-center gap-3 bg-white/5 backdrop-blur-xl ring-1 ring-white/10 rounded-full px-5 py-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
             <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#B08B57] shadow-[0_0_0_4px_rgba(176,139,87,0.18)]" />
             <span className="text-xs md:text-sm text-[#E7DFD6]/80 font-medium tracking-wide">
@@ -202,7 +228,8 @@ const BookmarksSection = () => {
           </h2>
 
           <p className="mt-6 max-w-2xl text-[#E7DFD6]/60">
-            Landscape bookmark and mini card designs — optimized for print and presentation.
+            Landscape bookmark and mini card designs — optimized for print and
+            presentation.
           </p>
         </div>
 
@@ -253,7 +280,9 @@ const BookmarksSection = () => {
         </div>
 
         {morePosts.length > 0 && (
-          <div className="mt-10 md:mt-14 flex justify-center">{/* Toggle area */}</div>
+          <div className="mt-10 md:mt-14 flex justify-center">
+            {/* Toggle area */}
+          </div>
         )}
       </div>
 
@@ -298,7 +327,9 @@ const BookmarksSection = () => {
                     src={p.src}
                     alt={p.title}
                     className={`absolute inset-0 w-full h-full object-contain p-4 md:p-6 transition-all duration-700 ${
-                      idx === activeIndex ? "opacity-100 scale-100" : "opacity-0 scale-105"
+                      idx === activeIndex
+                        ? "opacity-100 scale-100"
+                        : "opacity-0 scale-105"
                     }`}
                     loading="eager"
                     decoding="async"
@@ -340,11 +371,19 @@ const BookmarksSection = () => {
                     onClick={togglePlayPause}
                     className="inline-flex items-center gap-2 rounded-full bg-[#0A0B0D]/50 hover:bg-[#0A0B0D]/70 text-[#E7DFD6] px-3 py-1.5 ring-1 ring-white/10 transition"
                     aria-pressed={!reducedMotion && isPlaying}
-                    aria-label={isPlaying ? "Pause auto-rotate" : "Play auto-rotate"}
+                    aria-label={
+                      isPlaying ? "Pause auto-rotate" : "Play auto-rotate"
+                    }
                     title={isPlaying ? "Pause" : "Play"}
                   >
-                    {isPlaying ? <PauseIcon className="w-4 h-4" /> : <PlayIcon className="w-4 h-4" />}
-                    <span className="text-xs hidden sm:inline">{isPlaying ? "Pause" : "Play"}</span>
+                    {isPlaying ? (
+                      <PauseIcon className="w-4 h-4" />
+                    ) : (
+                      <PlayIcon className="w-4 h-4" />
+                    )}
+                    <span className="text-xs hidden sm:inline">
+                      {isPlaying ? "Pause" : "Play"}
+                    </span>
                   </button>
                 </div>
               </div>
@@ -357,7 +396,9 @@ const BookmarksSection = () => {
                       key={`bm-thumb-${idx}`}
                       onClick={() => select(idx)}
                       className={`relative overflow-hidden rounded-lg aspect-[4/3] group transition ${
-                        idx === activeIndex ? "ring-2 ring-[#B08B57]" : "ring-1 ring-white/10 hover:ring-white/20"
+                        idx === activeIndex
+                          ? "ring-2 ring-[#B08B57]"
+                          : "ring-1 ring-white/10 hover:ring-white/20"
                       }`}
                       aria-current={idx === activeIndex}
                       aria-label={`View ${p.title}`}
@@ -372,7 +413,9 @@ const BookmarksSection = () => {
                       />
                       <div
                         className={`absolute inset-0 transition ${
-                          idx === activeIndex ? "bg-[#B08B57]/20" : "bg-[#0A0B0D]/10 group-hover:bg-[#0A0B0D]/5"
+                          idx === activeIndex
+                            ? "bg-[#B08B57]/20"
+                            : "bg-[#0A0B0D]/10 group-hover:bg-[#0A0B0D]/5"
                         }`}
                       />
                     </button>

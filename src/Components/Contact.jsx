@@ -145,7 +145,7 @@ const Contact = () => {
       {/* Content */}
       <div className="relative max-w-7xl mx-auto px-6 py-24 md:py-32">
         {/* Header */}
-        <div data-aos="fade-up">
+        <div>
           <div className="inline-flex items-center gap-3 bg-white/5 backdrop-blur-xl ring-1 ring-white/10 rounded-full px-5 py-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
             <span className="inline-block w-2 h-2 rounded-full bg-[#B08B57]" />
             <span className="text-xs md:text-sm text-[#E7DFD6]/80 font-medium tracking-wide">

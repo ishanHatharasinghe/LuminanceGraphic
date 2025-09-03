@@ -58,3 +58,19 @@ a:hover .tooltip {
   visibility: visible;
 }
 
+@media (max-width: 768px) {
+  /* Hide complex background particles on mobile */
+  .absolute.inset-0.overflow-hidden > div {
+    display: none !important;
+  }
+  
+  /* Reduce blur effects */
+  .blur-3xl { filter: blur(8px) !important; }
+  .blur-2xl { filter: blur(4px) !important; }
+  
+  /* Disable complex animations */
+  .animate-float,
+  .animate-float-reverse {
+    animation: none !important;
+  }
+}
