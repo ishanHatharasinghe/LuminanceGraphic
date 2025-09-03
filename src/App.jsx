@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react"; // Import useRef for accessibility focus
 import "./index.css";
 import Header from "./Components/Header";
 import Home from "./Components/Home";
@@ -19,12 +19,30 @@ import CV from "./Components/CVdesigns";
 import Bookmark from "./Components/Bookmark";
 import Banner from "./Components/Banner";
 import Preloader from "./Components/Preloader";
+import Testimonials from "./Components/Testimonials";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { AuthProvider } from "./Components/AuthContext";
+
+import Image1 from "./assets/Home Section/main post.jpg";
 
 function App() {
-  const [count, setCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [showPopup, setShowPopup] = useState(false);
+  const popupRef = useRef(null); // Ref for accessibility
+
+  // Show after preloader finishes, only once per session
+  useEffect(() => {
+    if (!isLoading) {
+      const seen = sessionStorage.getItem("welcomePopupShown");
+      if (!seen) {
+        setShowPopup(true);
+        sessionStorage.setItem("welcomePopupShown", "1");
+      }
+    }
+  }, [isLoading]);
+
+  const closePopup = () => setShowPopup(false);
 
   useEffect(() => {
     // Initialize AOS
@@ -48,7 +66,6 @@ function App() {
       }, remainingTime);
     };
 
-    // Check if page is already loaded
     if (document.readyState === "complete") {
       handleLoad();
     } else {
@@ -56,6 +73,31 @@ function App() {
       return () => window.removeEventListener("load", handleLoad);
     }
   }, []);
+
+  // Escape key to close
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        closePopup();
+      }
+    };
+
+    if (showPopup) {
+      document.addEventListener("keydown", handleEscape);
+      if (popupRef.current) {
+        const closeButton = popupRef.current.querySelector(
+          'button[aria-label="Close"]'
+        );
+        if (closeButton) closeButton.focus();
+      }
+    } else {
+      document.removeEventListener("keydown", handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [showPopup]);
 
   const scrollToSection = (sectionId) => {
     const section = document.getElementById(sectionId);
@@ -69,7 +111,41 @@ function App() {
       {/* Preloader */}
       <Preloader isVisible={isLoading} />
 
-      {/* Main content - hidden during loading */}
+      {/* Welcome Popup */}
+      {showPopup && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="flex items-center justify-center fixed inset-0 z-[9999] bg-black/70"
+          onClick={closePopup}
+        >
+          <div
+            ref={popupRef}
+            className="relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button on top-right of the image */}
+            <button
+              onClick={closePopup}
+              aria-label="Close"
+              className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/95 text-black shadow-md 
+                         hover:bg-white hover:scale-105 transition flex items-center justify-center text-lg"
+            >
+              ✕
+            </button>
+
+            {/* Image centered */}
+            <img
+              src={Image1}
+              alt="Welcome"
+              className="max-w-[90vw] max-h-[80vh] object-contain rounded-lg shadow-2xl"
+              draggable="false"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Main content */}
       <div
         className={`transition-opacity duration-1000 ${
           isLoading ? "opacity-0" : "opacity-100"
@@ -128,6 +204,10 @@ function App() {
         <div id="Banner">
           <Banner />
         </div>
+
+        <AuthProvider>
+          <Testimonials id="Testimonials" />
+        </AuthProvider>
 
         <div id="contact">
           <Contact />
