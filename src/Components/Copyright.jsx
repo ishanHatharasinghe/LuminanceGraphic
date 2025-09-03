@@ -183,7 +183,7 @@ const Copyright = ({ designerName, contactHref, homeHref }) => {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                 />
               </svg>
               More Designs
@@ -222,6 +222,65 @@ const Copyright = ({ designerName, contactHref, homeHref }) => {
               </svg>
               Connect
             </h4>
+
+            {/* Social Links */}
+            <div className="space-y-3 mb-4">
+              {/* Facebook Link */}
+              <a
+                href="https://www.facebook.com/share/16uVBZEyjD/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-2 rounded-lg bg-white/5 hover:bg-white/10 ring-1 ring-white/10 hover:ring-[#B08B57]/30 transition-all duration-300 group"
+              >
+                <div className="flex-shrink-0 w-8 h-8 bg-[#1877F2] rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <svg
+                    className="w-4 h-4 text-white"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[#E7DFD6] group-hover:text-[#B08B57] transition-colors duration-300">
+                    Facebook
+                  </p>
+                  <p className="text-xs text-[#E7DFD6]/60 truncate">
+                    Follow us on Facebook
+                  </p>
+                </div>
+              </a>
+
+              {/* Email Link */}
+              <a
+                href="mailto:luminancegraphic@gmail.com"
+                className="flex items-center gap-3 p-2 rounded-lg bg-white/5 hover:bg-white/10 ring-1 ring-white/10 hover:ring-[#B08B57]/30 transition-all duration-300 group"
+              >
+                <div className="flex-shrink-0 w-8 h-8 bg-[#EA4335] rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <svg
+                    className="w-4 h-4 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[#E7DFD6] group-hover:text-[#B08B57] transition-colors duration-300">
+                    Email
+                  </p>
+                  <p className="text-xs text-[#E7DFD6]/60 truncate">
+                    luminancegraphic@gmail.com
+                  </p>
+                </div>
+              </a>
+            </div>
 
             {/* QR Code */}
             <div className="bg-white/5 p-3 rounded-lg ring-1 ring-white/10 backdrop-blur-sm shadow-lg w-fit">

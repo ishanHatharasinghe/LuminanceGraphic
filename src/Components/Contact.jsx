@@ -197,6 +197,15 @@ const Contact = () => {
             <span className="relative z-10 text-sm font-medium">WhatsApp</span>
             <div className="absolute inset-0 bg-[#B08B57]/15 scale-0 group-hover:scale-100 transition-transform duration-500 rounded-full" />
           </a>
+          <a
+            href="https://www.facebook.com/share/16uVBZEyjD/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative inline-flex items-center justify-center border-2 border-[#E7DFD6]/25 text-[#E7DFD6] px-5 py-3 rounded-full overflow-hidden transition-all duration-500 hover:border-[#B08B57]"
+          >
+            <span className="relative z-10 text-sm font-medium">Facebook</span>
+            <div className="absolute inset-0 bg-[#B08B57]/15 scale-0 group-hover:scale-100 transition-transform duration-500 rounded-full" />
+          </a>
         </div>
 
         {/* Contact Form to WhatsApp */}
