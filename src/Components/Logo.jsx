@@ -375,9 +375,6 @@ const LogoDesignSection = () => {
                       draggable="false"
                     />
                   </div>
-                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                    <div className="w-28 h-28 rounded-full border border-white/10 animate-[orbit_18s_linear_infinite]" />
-                  </div>
                 </div>
 
                 <div className="absolute inset-x-0 bottom-0 p-4">

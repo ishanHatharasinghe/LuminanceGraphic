@@ -494,11 +494,6 @@ const TShirtDesignSection = () => {
               ))}
             </div>
 
-            {/* Orbit ring */}
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-              <div className="w-32 h-32 rounded-full border border-white/10 animate-[orbit_18s_linear_infinite]" />
-            </div>
-
             {/* Arrows */}
             {hasTwo && (
               <>

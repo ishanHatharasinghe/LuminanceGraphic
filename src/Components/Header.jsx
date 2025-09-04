@@ -22,9 +22,9 @@ const COLORS = {
   darkBg: "#0A0B0D",
   darkCard: "#141518"
 };
-
+import { PiContactlessPaymentFill } from "react-icons/pi";
 import logo from "../assets/logo.png";
-
+import { RiHomeWifiFill } from "react-icons/ri";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -120,7 +120,7 @@ const Navbar = () => {
   };
 
   const mainNavItems = [
-    { id: "home", label: "Home", icon: Star },
+    { id: "home", label: "Home", icon: RiHomeWifiFill },
     { id: "about", label: "About", icon: FileText },
     { id: "content", label: "Content", icon: Grid3X3 },
     { id: "testimonials", label: "Testimonials", icon: MessageSquare }
@@ -399,7 +399,7 @@ const Navbar = () => {
               className="ml-4 group relative overflow-hidden px-7 py-3 rounded-2xl bg-gradient-to-r from-[#B08B57] to-[#D4A574] text-[#0A0B0D] font-bold text-sm transition-all duration-300 hover:shadow-xl hover:shadow-[#B08B57]/25 hover:-translate-y-0.5"
             >
               <span className="relative z-10 flex items-center gap-2">
-                <Sparkles className="w-4 h-4" />
+                <PiContactlessPaymentFill className="w-6 h-6" />
                 Let's Connect
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-[#C89B67] to-[#E5B885] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -574,7 +574,7 @@ const Navbar = () => {
                             : "bg-white/10 text-[#E7DFD6]/60 group-hover:bg-[#B08B57]/10 group-hover:text-[#B08B57]"
                         }`}
                       >
-                        <Sparkles className="w-4 h-4" />
+                        <PiContactlessPaymentFill className="w-5 h-5" />
                       </div>
                       <div>
                         <div className="font-bold text-base mb-1">

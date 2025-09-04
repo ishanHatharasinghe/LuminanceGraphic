@@ -244,10 +244,11 @@ const About = () => {
       name: "Pasindu Lakshan",
       role: "Graphic Designer",
       avatar: member1,
-      tagline: "Textile and Apparel Engineer UG • Graphic Designer",
+      tagline:
+        "Textile and Apparel Engineer UG • Graphic Designer • Video Editor • Youtuber ",
       bio: "Skilled graphic designer experienced in Adobe Creative Suite, delivering innovative and modern designs that enhance user engagement and brand identity",
 
-      skills: ["Illustrator", "Photoshop"],
+      skills: ["Illustrator", "Photoshop", "Premiere Pro"],
       socials: {
         behance: "https://behance.net/",
         linkedin: "http://linkedin.com/in/pasindu-lakshan5"

@@ -5,6 +5,10 @@ import { useEffect, useRef, useState } from "react";
 import card1 from "../assets/Business Cards/4.jpg";
 import card2 from "../assets/Business Cards/6.jpg";
 import card3 from "../assets/Business Cards/7.jpg";
+import card4 from "../assets/Business Cards/IMG-20250901-WA0036.jpg";
+import card5 from "../assets/Business Cards/IMG-20250901-WA0037.jpg";
+import card6 from "../assets/Business Cards/IMG-20250901-WA0071.jpg";
+import card7 from "../assets/Business Cards/IMG-20250901-WA0072.jpg";
 
 // Theme (consistent with the site)
 const COLORS = {
@@ -86,7 +90,11 @@ const BusinessCardsSection = () => {
   const featured = [
     { src: card1, title: "Business Card 1", category: "Print • Business Card" },
     { src: card2, title: "Business Card 2", category: "Print • Business Card" },
-    { src: card3, title: "Business Card 3", category: "Print • Business Card" }
+    { src: card3, title: "Business Card 3", category: "Print • Business Card" },
+    { src: card4, title: "Business Card 4", category: "Print • Business Card" },
+    { src: card5, title: "Business Card 5", category: "Print • Business Card" },
+    { src: card6, title: "Business Card 6", category: "Print • Business Card" },
+    { src: card7, title: "Business Card 7", category: "Print • Business Card" }
   ];
 
   const morePosts = []; // extend here in the future
@@ -252,10 +260,6 @@ const BusinessCardsSection = () => {
                       decoding="async"
                       draggable="false"
                     />
-                  </div>
-                  {/* subtle orbit ring */}
-                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                    <div className="w-36 h-36 rounded-full border border-white/10 animate-[orbit_18s_linear_infinite]" />
                   </div>
                 </div>
 
