@@ -12,9 +12,134 @@ import Tdesign7 from "../assets/Tshirt Designs/7.jpg";
 import Tdesign8 from "../assets/Tshirt Designs/8.jpg";
 import Tdesign9 from "../assets/Tshirt Designs/9.jpg";
 import Tdesign10 from "../assets/Tshirt Designs/10.jpg";
+import Tdesign11 from "../assets/Tshirt Designs/ts1.jpg";
+import Tdesign12 from "../assets/Tshirt Designs/ts2.jpg";
+import Tdesign13 from "../assets/Tshirt Designs/ts3.jpg";
+import Tdesign14 from "../assets/Tshirt Designs/ts4.jpg";
 
 // Images (Caps) — add more here as needed
 import Cap1 from "../assets/Cap/IMG-20250901-WA0013.jpg";
+
+// ========== DATA CONFIGURATION ==========
+// Edit this JSON structure to control which images appear in each grid and their swipe order
+const DESIGN_DATA = {
+  tshirts: {
+    title: "T‑Shirt Designs",
+    grids: [
+      {
+        id: "tshirt-grid-1",
+        images: [
+          {
+            src: Tdesign11,
+            title: "T‑Shirt Design 1",
+            category: "T‑Shirt"
+          },
+          {
+            src: Tdesign1,
+            title: "T‑Shirt Design 1",
+            category: "T‑Shirt"
+          },
+          {
+            src: Tdesign2,
+            title: "T‑Shirt Design 1",
+            category: "T‑Shirt"
+          }
+        ]
+      },
+      {
+        id: "tshirt-grid-2",
+        images: [
+          {
+            src: Tdesign12,
+            title: "T‑Shirt Design 2",
+            category: "T‑Shirt"
+          },
+          {
+            src: Tdesign3,
+            title: "T‑Shirt Design 2",
+            category: "T‑Shirt"
+          },
+          {
+            src: Tdesign4,
+            title: "T‑Shirt Design 2",
+            category: "T‑Shirt"
+          }
+        ]
+      },
+      {
+        id: "tshirt-grid-3",
+        images: [
+          {
+            src: Tdesign13,
+            title: "T‑Shirt Design 3",
+            category: "T‑Shirt"
+          },
+          {
+            src: Tdesign5,
+            title: "T‑Shirt Design 3",
+            category: "T‑Shirt"
+          },
+          {
+            src: Tdesign6,
+            title: "T‑Shirt Design 3",
+            category: "T‑Shirt"
+          }
+        ]
+      },
+      {
+        id: "tshirt-grid-4",
+        images: [
+          {
+            src: Tdesign14,
+            title: "T‑Shirt Design 4",
+            category: "T‑Shirt"
+          },
+          {
+            src: Tdesign7,
+            title: "T‑Shirt Design 4",
+            category: "T‑Shirt"
+          },
+          {
+            src: Tdesign8,
+            title: "T‑Shirt Design 4",
+            category: "T‑Shirt"
+          }
+        ]
+      },
+      {
+        id: "tshirt-grid-5",
+        images: [
+          {
+            src: Tdesign9,
+            title: "T‑Shirt Design 5",
+            category: "T‑Shirt"
+          },
+          {
+            src: Tdesign10,
+            title: "T‑Shirt Design 5",
+            category: "T‑Shirt"
+          }
+        ]
+      }
+    ]
+  },
+  caps: {
+    title: "Cap Designs",
+    grids: [
+      {
+        id: "cap-grid-1",
+        images: [
+          {
+            src: Cap1,
+            title: "Cap Design 1",
+            category: "Cap"
+          }
+        ]
+      }
+      // Add more cap grids here as needed
+    ]
+  }
+};
 
 // Theme
 const COLORS = {
@@ -140,48 +265,53 @@ const TShirtDesignSection = () => {
   const dragStartRef2 = useRef({ x: 0, y: 0 });
   const offsetStartRef2 = useRef({ x: 0, y: 0 });
 
-  // Data: split by category
-  const tshirtSources = [
-    Tdesign1,
-    Tdesign2,
-    Tdesign3,
-    Tdesign4,
-    Tdesign5,
-    Tdesign6,
-    Tdesign7,
-    Tdesign8,
-    Tdesign9,
-    Tdesign10
-  ];
-  const capSources = [Cap1]; // Add more caps here when available
+  // ========== PROCESSED DATA ==========
+  // Create unified list for overlay with global indices
+  const allPosts = [];
+  let globalIndex = 0;
 
-  const tshirtCovers = tshirtSources.map((src, i) => ({
-    src,
-    title: `T‑Shirt Design ${i + 1}`,
-    category: "T‑Shirt"
-  }));
-  const capCovers = capSources.map((src, i) => ({
-    src,
-    title: `Cap Design ${i + 1}`,
-    category: "Cap"
-  }));
+  DESIGN_DATA.tshirts.grids.forEach((grid) => {
+    grid.images.forEach((image) => {
+      allPosts.push({
+        ...image,
+        globalIndex: globalIndex++
+      });
+    });
+  });
 
-  // Unified for overlay
-  const allPosts = [...tshirtCovers, ...capCovers];
-  const capsOffset = tshirtCovers.length;
+  DESIGN_DATA.caps.grids.forEach((grid) => {
+    grid.images.forEach((image) => {
+      allPosts.push({
+        ...image,
+        globalIndex: globalIndex++
+      });
+    });
+  });
 
-  // Pair builders (2 images per card), using global indices
-  const buildPairs = (offset, len) => {
-    const pairs = [];
-    for (let i = 0; i < len; i += 2) {
-      const a = offset + i;
-      const b = offset + i + 1;
-      pairs.push([a, b].filter((x) => x < offset + len));
+  // Assign global indices to grid images for overlay mapping
+  globalIndex = 0;
+  const processedData = {
+    tshirts: {
+      ...DESIGN_DATA.tshirts,
+      grids: DESIGN_DATA.tshirts.grids.map((grid) => ({
+        ...grid,
+        images: grid.images.map((img) => ({
+          ...img,
+          globalIndex: globalIndex++
+        }))
+      }))
+    },
+    caps: {
+      ...DESIGN_DATA.caps,
+      grids: DESIGN_DATA.caps.grids.map((grid) => ({
+        ...grid,
+        images: grid.images.map((img) => ({
+          ...img,
+          globalIndex: globalIndex++
+        }))
+      }))
     }
-    return pairs;
   };
-  const tshirtPairs = buildPairs(0, tshirtCovers.length);
-  const capPairs = buildPairs(capsOffset, capCovers.length);
 
   // Spotlight cursor
   const handleSectionMouseMove = (e) => {
@@ -284,8 +414,8 @@ const TShirtDesignSection = () => {
     });
   }, [overlayOpen, activeIndex, allPosts]);
 
-  const openOverlay = (index) => {
-    setActiveIndex(index);
+  const openOverlay = (globalIndex) => {
+    setActiveIndex(globalIndex);
     setIsLoading(true);
     setOverlayOpen(true);
     setIsPlaying(false);
@@ -390,30 +520,29 @@ const TShirtDesignSection = () => {
     }
   };
 
-  // Duo slider card (2 images per card)
-  const DuoSliderCard = ({ pair }) => {
-    const slides = pair.map((i) => ({ ...allPosts[i], index: i }));
+  // Grid slider card (swipeable images within a grid)
+  const GridSliderCard = ({ grid }) => {
     const [index, setIndex] = useState(0);
     const [hovering, setHovering] = useState(false);
     const [playing, setPlaying] = useState(true);
     const autoRef = useRef(null);
     const swipeRef = useRef({ x: 0, y: 0, moved: false });
 
-    const hasTwo = slides.length > 1;
+    const hasMultiple = grid.images.length > 1;
 
-    const nextSlide = () => setIndex((i) => (i + 1) % slides.length);
+    const nextSlide = () => setIndex((i) => (i + 1) % grid.images.length);
     const prevSlide = () =>
-      setIndex((i) => (i - 1 + slides.length) % slides.length);
+      setIndex((i) => (i - 1 + grid.images.length) % grid.images.length);
 
     // Autoplay (pause on hover, respect reduced motion)
     useEffect(() => {
-      if (!hasTwo || reducedMotion || !playing || hovering) {
+      if (!hasMultiple || reducedMotion || !playing || hovering) {
         if (autoRef.current) clearInterval(autoRef.current);
         return;
       }
       autoRef.current = setInterval(nextSlide, 3000);
       return () => clearInterval(autoRef.current);
-    }, [playing, hovering, reducedMotion, hasTwo]);
+    }, [playing, hovering, reducedMotion, hasMultiple]);
 
     // Swipe handlers
     const onPointerDown = (e) => {
@@ -429,7 +558,7 @@ const TShirtDesignSection = () => {
       if (Math.abs(dx) > 8 || Math.abs(dy) > 8) swipeRef.current.moved = true;
     };
     const onPointerUp = (e) => {
-      if (!hasTwo) return;
+      if (!hasMultiple) return;
       const x = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
       const dx = x - swipeRef.current.x;
       if (Math.abs(dx) > 40) {
@@ -439,7 +568,7 @@ const TShirtDesignSection = () => {
 
     const open = () => {
       if (swipeRef.current.moved) return; // prevent click after swipe
-      openOverlay(slides[index].index);
+      openOverlay(grid.images[index].globalIndex);
     };
 
     // Ensure arrow interactions never bubble to parent
@@ -448,6 +577,8 @@ const TShirtDesignSection = () => {
       e.stopPropagation();
       swipeRef.current.moved = true;
     };
+
+    const currentImage = grid.images[index];
 
     return (
       <div className="group relative rounded-2xl p-[1px] bg-gradient-to-br from-white/10 via-white/5 to-transparent ring-1 ring-white/10 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)] hover:shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] transition-all duration-500">
@@ -477,14 +608,14 @@ const TShirtDesignSection = () => {
               className="flex w-full h-full transition-transform duration-700 ease-out"
               style={{ transform: `translateX(-${index * 100}%)` }}
             >
-              {slides.map((s, i) => (
+              {grid.images.map((img, i) => (
                 <div
-                  key={`duo-${s.index}-${i}`}
+                  key={`${grid.id}-${i}`}
                   className="w-full h-full shrink-0 relative"
                 >
                   <img
-                    src={s.src}
-                    alt={s.title}
+                    src={img.src}
+                    alt={img.title}
                     className="w-full h-full object-cover select-none pointer-events-none"
                     draggable="false"
                     loading="lazy"
@@ -495,7 +626,7 @@ const TShirtDesignSection = () => {
             </div>
 
             {/* Arrows */}
-            {hasTwo && (
+            {hasMultiple && (
               <>
                 <div className="absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none">
                   <button
@@ -539,9 +670,9 @@ const TShirtDesignSection = () => {
             )}
 
             {/* Dots + play/pause */}
-            {hasTwo && (
+            {hasMultiple && (
               <div className="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-2">
-                {[0, 1].map((i) => (
+                {grid.images.map((_, i) => (
                   <span
                     key={`dot-${i}`}
                     className={`h-1.5 rounded-full transition-all ${
@@ -578,11 +709,11 @@ const TShirtDesignSection = () => {
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#B08B57] animate-pulse" />
               <span className="text-xs md:text-sm text-[#E7DFD6]/80 font-medium tracking-wide">
-                {slides[index]?.category}
+                {currentImage?.category}
               </span>
             </div>
             <h3 className="mt-1 text-base md:text-lg font-semibold text-[#E7DFD6]">
-              {slides[index]?.title}
+              {currentImage?.title}
             </h3>
           </div>
 
@@ -643,30 +774,34 @@ const TShirtDesignSection = () => {
         </div>
 
         {/* T‑Shirt Designs */}
-        {tshirtPairs.length > 0 && (
+        {processedData.tshirts.grids.length > 0 && (
           <div className="mb-12">
             <div className="mb-4 md:mb-6 flex items-center gap-3">
               <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#B08B57]" />
-              <h3 className="text-xl md:text-2xl font-bold">T‑Shirt Designs</h3>
+              <h3 className="text-xl md:text-2xl font-bold">
+                {processedData.tshirts.title}
+              </h3>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {tshirtPairs.map((pair, i) => (
-                <DuoSliderCard key={`tee-pair-${i}`} pair={pair} />
+              {processedData.tshirts.grids.map((grid) => (
+                <GridSliderCard key={grid.id} grid={grid} />
               ))}
             </div>
           </div>
         )}
 
         {/* Cap Designs */}
-        {capPairs.length > 0 && (
+        {processedData.caps.grids.length > 0 && (
           <div>
             <div className="mb-4 md:mb-6 flex items-center gap-3">
               <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#B08B57]" />
-              <h3 className="text-xl md:text-2xl font-bold">Cap Designs</h3>
+              <h3 className="text-xl md:text-2xl font-bold">
+                {processedData.caps.title}
+              </h3>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {capPairs.map((pair, i) => (
-                <DuoSliderCard key={`cap-pair-${i}`} pair={pair} />
+              {processedData.caps.grids.map((grid) => (
+                <GridSliderCard key={grid.id} grid={grid} />
               ))}
             </div>
           </div>
@@ -700,7 +835,7 @@ const TShirtDesignSection = () => {
                   <span className="w-2 h-2 rounded-full bg-[#B08B57] animate-pulse" />
                   <div>
                     <div className="text-sm md:text-base font-semibold text-[#E7DFD6]">
-                      {allPosts[activeIndex].title}
+                      {allPosts[activeIndex]?.title}
                     </div>
                     <div className="text-xs text-[#E7DFD6]/60">
                       {activeIndex + 1} / {allPosts.length}
@@ -743,7 +878,7 @@ const TShirtDesignSection = () => {
                     <ZoomInIcon className="w-5 h-5" />
                   </button>
                   <a
-                    href={allPosts[activeIndex].src}
+                    href={allPosts[activeIndex]?.src}
                     download
                     className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/10 hover:bg-white/15 text-[#E7DFD6] ring-1 ring-white/10 transition"
                     aria-label="Download image"
@@ -812,9 +947,9 @@ const TShirtDesignSection = () => {
                 {/* Image */}
                 <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
                   <img
-                    key={allPosts[activeIndex].src}
-                    src={allPosts[activeIndex].src}
-                    alt={allPosts[activeIndex].title}
+                    key={allPosts[activeIndex]?.src}
+                    src={allPosts[activeIndex]?.src}
+                    alt={allPosts[activeIndex]?.title}
                     onLoad={() => setIsLoading(false)}
                     className="max-w-full max-h-full object-contain will-change-transform transition-opacity duration-300"
                     style={{

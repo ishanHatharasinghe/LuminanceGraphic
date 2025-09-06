@@ -1,45 +1,47 @@
 // TestimonialsSection.jsx
 import {
-    Briefcase,
-    Edit,
-    LogIn,
-    LogOut,
-    Quote,
-    Send,
-    Star,
-    Trash2,
-    User
+  Briefcase,
+  Edit,
+  LogIn,
+  LogOut,
+  Quote,
+  Send,
+  Star,
+  Trash2,
+  User
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
-    auth,
-    db,
-    onValue,
-    provider,
-    push,
-    ref,
-    remove,
-    signInWithPopup,
-    signOut,
-    update
+  auth,
+  db,
+  onValue,
+  provider,
+  push,
+  ref,
+  remove,
+  signInWithPopup,
+  signOut,
+  update
 } from "../firebase";
 import { useAuth } from "./AuthContext";
+import { backupTestimonialToSupabase } from "../supabase"; // Import Supabase backup function
 
 const COLORS = {
   marble: "#E7DFD6",
-  bronze: "#B08B57", 
+  bronze: "#B08B57",
   slate: "#6B7785",
   ink: "#1F232B",
   darkBg: "#0A0B0D",
   darkCard: "#141518",
-  peach: "#F1D6BF"
+  peach: "#F1D6BF",
+  glowYellow: "#FFFF00"
 };
 
 const TestimonialsSection = () => {
   const { currentUser, isAdmin } = useAuth();
   const [mouse, setMouse] = useState({ x: "50%", y: "50%" });
   const sectionRef = useRef(null);
-  
+
   const [testimonials, setTestimonials] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState({
@@ -57,8 +59,42 @@ const TestimonialsSection = () => {
 
   const occupations = [
     "Select an occupation",
+
+    // Engineering related
+    "Software Engineer",
+    "Civil Engineer",
+    "Mechanical Engineer",
+    "Electrical Engineer",
+    "Electronics Engineer",
+    "Computer Engineer",
+    "Chemical Engineer",
+    "Biomedical Engineer",
+    "Aerospace Engineer",
+    "Industrial Engineer",
+
+    // Teaching related
+    "Teacher",
+    "School Principal",
+    "University Lecturer",
+    "Professor",
+    "Tutor",
+    "Researcher",
+    "Education Consultant",
+    "Teaching Assistant",
+
+    // Designer related
+    "Graphic Designer",
+    "UI/UX Designer",
+    "Web Designer",
+    "Interior Designer",
+    "Fashion Designer",
+    "Product Designer",
+    "Game Designer",
+    "Motion Graphics Designer",
+
+    // Others (original list)
     "Business Owner",
-    "Marketing Manager", 
+    "Marketing Manager",
     "Social Media Manager",
     "Content Creator",
     "Influencer",
@@ -113,6 +149,17 @@ const TestimonialsSection = () => {
       setIsLoading(false);
     });
   }, []);
+
+  // Auto-fill email when user logs in
+  useEffect(() => {
+    if (currentUser && currentUser.email && !editingId) {
+      setFormData((prev) => ({
+        ...prev,
+        email: currentUser.email,
+        name: prev.name || currentUser.displayName || ""
+      }));
+    }
+  }, [currentUser, editingId]);
 
   const handleGoogleLogin = async () => {
     try {
@@ -179,12 +226,36 @@ const TestimonialsSection = () => {
         userPhotoURL: currentUser.photoURL
       };
 
+      let firebaseResult;
+      let firebaseId = null;
+
       if (editingId) {
+        // Update existing testimonial
         await update(ref(db, `testimonials/${editingId}`), testimonialData);
+        firebaseId = editingId;
         setSuccessMessage("Testimonial updated successfully!");
       } else {
-        await push(ref(db, "testimonials"), testimonialData);
+        // Add new testimonial
+        firebaseResult = await push(ref(db, "testimonials"), testimonialData);
+        firebaseId = firebaseResult.key;
         setSuccessMessage("Thank you for your testimonial!");
+      }
+
+      // Backup to Supabase (async, don't wait for it)
+      if (!editingId) {
+        // Only backup new testimonials, not updates
+        testimonialData.firebaseId = firebaseId;
+        backupTestimonialToSupabase(testimonialData)
+          .then((result) => {
+            if (result.success) {
+              console.log("✅ Testimonial backed up to Supabase successfully");
+            } else {
+              console.warn("⚠️ Supabase backup failed:", result.error);
+            }
+          })
+          .catch((error) => {
+            console.warn("⚠️ Supabase backup error:", error);
+          });
       }
 
       setFormData({
@@ -200,7 +271,6 @@ const TestimonialsSection = () => {
       setTimeout(() => {
         setSuccessMessage("");
       }, 3000);
-
     } catch (err) {
       console.error(err);
       setError("Something went wrong! Please try again.");
@@ -242,8 +312,18 @@ const TestimonialsSection = () => {
       <Star
         key={i}
         className={`w-4 h-4 ${
-          i < rating ? "fill-[#B08B57] text-[#B08B57]" : "text-[#E7DFD6]/30"
+          i < rating
+            ? "fill-[#FFFF00] text-[#FFFF00] drop-shadow-[0_0_8px_rgba(255,255,0,0.6)]"
+            : "text-[#E7DFD6]/30"
         }`}
+        style={
+          i < rating
+            ? {
+                filter:
+                  "drop-shadow(0 0 4px #FFFF00) drop-shadow(0 0 8px rgba(255,255,0,0.4))"
+              }
+            : {}
+        }
       />
     ));
   };
@@ -271,10 +351,8 @@ const TestimonialsSection = () => {
         }}
       />
 
-      
       {/* Content */}
       <div className="relative max-w-7xl mx-auto px-6 py-24 md:py-32">
-        
         {/* Header */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-3 bg-white/5 backdrop-blur-xl ring-1 ring-white/10 rounded-full px-5 py-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.3)] mb-6">
@@ -294,7 +372,8 @@ const TestimonialsSection = () => {
           </h1>
 
           <p className="text-[#E7DFD6]/70 max-w-2xl mx-auto">
-            Real feedback from clients who trusted me with their brand identity and design needs.
+            Real feedback from clients who trusted me with their brand identity
+            and design needs.
           </p>
 
           {/* Auth buttons */}
@@ -303,12 +382,19 @@ const TestimonialsSection = () => {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-3 text-sm text-[#E7DFD6]/80">
                   <img
-                    src={currentUser.photoURL || getProfilePictureUrl(currentUser.email)}
+                    src={
+                      currentUser.photoURL ||
+                      getProfilePictureUrl(currentUser.email)
+                    }
                     alt="Profile"
                     className="w-8 h-8 rounded-full ring-2 ring-[#B08B57]/30"
                   />
-                  <span>Welcome, {currentUser.displayName || currentUser.email}</span>
-                  {isAdmin && <span className="text-[#B08B57] font-medium">(Admin)</span>}
+                  <span>
+                    Welcome, {currentUser.displayName || currentUser.email}
+                  </span>
+                  {isAdmin && (
+                    <span className="text-[#B08B57] font-medium">(Admin)</span>
+                  )}
                 </div>
                 <button
                   onClick={handleLogout}
@@ -329,7 +415,9 @@ const TestimonialsSection = () => {
                 }}
               >
                 <LogIn className="h-4 w-4 mr-2" />
-                <span className="relative z-10 text-sm font-medium">Login with Google to Share</span>
+                <span className="relative z-10 text-sm font-medium">
+                  Login with Google to Share
+                </span>
                 <div className="absolute inset-0 -z-10">
                   <div className="absolute inset-0 bg-gradient-to-r from-[#C89B67] to-[#D4A574] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="absolute -inset-8 bg-[#B08B57]/35 blur-2xl group-hover:blur-3xl transition-all duration-500" />
@@ -340,7 +428,6 @@ const TestimonialsSection = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          
           {/* Testimonial Form */}
           <div className="order-2 lg:order-1">
             <div className="rounded-2xl p-6 bg-white/[0.06] backdrop-blur-xl ring-1 ring-white/10 shadow-[0_20px_70px_-20px_rgba(0,0,0,0.6)]">
@@ -450,20 +537,30 @@ const TestimonialsSection = () => {
                         <button
                           key={star}
                           type="button"
-                          onClick={() => setFormData({ ...formData, rating: star })}
-                          className="transition-colors duration-200"
+                          onClick={() =>
+                            setFormData({ ...formData, rating: star })
+                          }
+                          className="transition-all duration-200"
                         >
                           <Star
                             className={`w-8 h-8 ${
                               star <= formData.rating
-                                ? "fill-[#B08B57] text-[#B08B57]"
-                                : "text-[#E7DFD6]/30 hover:text-[#B08B57]/50"
+                                ? "fill-[#FFFF00] text-[#FFFF00] drop-shadow-[0_0_8px_rgba(255,255,0,0.6)]"
+                                : "text-[#E7DFD6]/30 hover:text-[#FFFF00]/50"
                             }`}
+                            style={
+                              star <= formData.rating
+                                ? {
+                                    filter:
+                                      "drop-shadow(0 0 4px #FFFF00) drop-shadow(0 0 8px rgba(255,255,0,0.4))"
+                                  }
+                                : {}
+                            }
                           />
                         </button>
                       ))}
                       <span className="ml-3 text-sm text-[#E7DFD6]/70 self-center">
-                        {formData.rating} star{formData.rating !== 1 ? 's' : ''}
+                        {formData.rating} star{formData.rating !== 1 ? "s" : ""}
                       </span>
                     </div>
                   </div>
@@ -489,7 +586,7 @@ const TestimonialsSection = () => {
                     disabled={isSubmitting}
                     className="group relative inline-flex items-center justify-center w-full px-6 py-4 rounded-xl text-[#0A0B0D] overflow-hidden disabled:opacity-60 disabled:cursor-not-allowed"
                     style={{
-                      background: isSubmitting ? '#888' : COLORS.bronze,
+                      background: isSubmitting ? "#888" : COLORS.bronze,
                       boxShadow: "0 16px 36px -16px rgba(176,139,87,.45)"
                     }}
                   >
@@ -501,7 +598,11 @@ const TestimonialsSection = () => {
                         </>
                       ) : (
                         <>
-                          <span>{editingId ? "Update Testimonial" : "Share Testimonial"}</span>
+                          <span>
+                            {editingId
+                              ? "Update Testimonial"
+                              : "Share Testimonial"}
+                          </span>
                           <Send className="h-4 w-4" />
                         </>
                       )}
@@ -535,7 +636,8 @@ const TestimonialsSection = () => {
                 <div className="text-center py-12">
                   <User className="w-16 h-16 text-[#E7DFD6]/30 mx-auto mb-4" />
                   <p className="text-[#E7DFD6]/70">
-                    Please login with Google to share your testimonial and help others discover the quality of my design services.
+                    Please login with Google to share your testimonial and help
+                    others discover the quality of my design services.
                   </p>
                 </div>
               )}
@@ -547,7 +649,7 @@ const TestimonialsSection = () => {
             <h2 className="text-2xl font-bold text-white mb-6">
               Recent Testimonials ({testimonials.length})
             </h2>
-            
+
             {testimonials.length > 0 ? (
               <div className="space-y-6 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
                 {testimonials.map((testimonial) => (
@@ -576,7 +678,7 @@ const TestimonialsSection = () => {
                     )}
 
                     <Quote className="w-8 h-8 text-[#B08B57]/30 mb-4" />
-                    
+
                     {/* Rating */}
                     <div className="flex items-center gap-1 mb-4">
                       {renderStars(testimonial.rating)}
@@ -593,9 +695,13 @@ const TestimonialsSection = () => {
                     {/* User info */}
                     <div className="flex items-center gap-4 pt-4 border-t border-white/10">
                       <div className="w-12 h-12 rounded-full bg-[#B08B57]/20 p-0.5 flex-shrink-0">
-                        {testimonial.userPhotoURL || testimonial.profilePictureUrl ? (
+                        {testimonial.userPhotoURL ||
+                        testimonial.profilePictureUrl ? (
                           <img
-                            src={testimonial.userPhotoURL || testimonial.profilePictureUrl}
+                            src={
+                              testimonial.userPhotoURL ||
+                              testimonial.profilePictureUrl
+                            }
                             alt={`${testimonial.name}'s profile`}
                             className="w-full h-full rounded-full object-cover"
                             onError={(e) => {
@@ -607,13 +713,17 @@ const TestimonialsSection = () => {
                         <div
                           className="w-full h-full rounded-full bg-[#B08B57]/30 flex items-center justify-center"
                           style={{
-                            display: testimonial.userPhotoURL || testimonial.profilePictureUrl ? "none" : "flex"
+                            display:
+                              testimonial.userPhotoURL ||
+                              testimonial.profilePictureUrl
+                                ? "none"
+                                : "flex"
                           }}
                         >
                           <User className="w-6 h-6 text-[#E7DFD6]" />
                         </div>
                       </div>
-                      
+
                       <div className="flex-1 min-w-0">
                         <h4 className="font-semibold text-[#E7DFD6] truncate">
                           {testimonial.name}
@@ -625,11 +735,14 @@ const TestimonialsSection = () => {
                           </span>
                         </div>
                         <p className="text-xs text-[#E7DFD6]/40 mt-1">
-                          {new Date(testimonial.dateAndTime).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                          })}
+                          {new Date(testimonial.dateAndTime).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric"
+                            }
+                          )}
                         </p>
                       </div>
                     </div>
@@ -653,41 +766,70 @@ const TestimonialsSection = () => {
 
       {/* Local styles */}
       <style jsx>{`
-        @keyframes slide-up { 
-          from { transform: translateY(100%); } 
-          to { transform: translateY(0); } 
+        @keyframes slide-up {
+          from {
+            transform: translateY(100%);
+          }
+          to {
+            transform: translateY(0);
+          }
         }
-        @keyframes expand-width { 
-          from { width: 0; } 
-          to { width: 200px; } 
+        @keyframes expand-width {
+          from {
+            width: 0;
+          }
+          to {
+            width: 200px;
+          }
         }
         @keyframes grain {
-          0%,100% { transform: translate(0,0); }
-          10% { transform: translate(-5%,-10%); } 
-          20% { transform: translate(-15%,5%); }
-          30% { transform: translate(7%,-25%); } 
-          40% { transform: translate(-5%,25%); }
-          50% { transform: translate(-15%,10%); } 
-          60% { transform: translate(15%,0%); }
-          70% { transform: translate(0%,15%); } 
-          80% { transform: translate(3%,25%); }
-          90% { transform: translate(-10%,10%); }
+          0%,
+          100% {
+            transform: translate(0, 0);
+          }
+          10% {
+            transform: translate(-5%, -10%);
+          }
+          20% {
+            transform: translate(-15%, 5%);
+          }
+          30% {
+            transform: translate(7%, -25%);
+          }
+          40% {
+            transform: translate(-5%, 25%);
+          }
+          50% {
+            transform: translate(-15%, 10%);
+          }
+          60% {
+            transform: translate(15%, 0%);
+          }
+          70% {
+            transform: translate(0%, 15%);
+          }
+          80% {
+            transform: translate(3%, 25%);
+          }
+          90% {
+            transform: translate(-10%, 10%);
+          }
         }
-        
-        .animate-slide-up { 
-          animation: slide-up .8s cubic-bezier(0.16,1,0.3,1) forwards; 
+
+        .animate-slide-up {
+          animation: slide-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-        .animate-expand-width { 
-          animation: expand-width 1s cubic-bezier(0.16,1,0.3,1) .4s forwards; 
+        .animate-expand-width {
+          animation: expand-width 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
         }
-        .animate-grain { 
-          animation: grain 8s steps(10) infinite; 
+        .animate-grain {
+          animation: grain 8s steps(10) infinite;
         }
-        
-        .bg-noise { 
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); 
+
+        .bg-noise {
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
         }
-        
+
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
