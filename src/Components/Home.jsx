@@ -318,7 +318,7 @@ const HomePage = () => {
                 }`}
               >
                 <a
-                  href="#work"
+                  href="#content"
                   className="group relative inline-flex items-center justify-center px-8 py-4 rounded-full text-[#0A0B0D] overflow-hidden"
                   style={{
                     background: COLORS.bronze,

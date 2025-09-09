@@ -20,6 +20,7 @@ import Bookmark from "./Components/Bookmark";
 import Banner from "./Components/Banner";
 import Preloader from "./Components/Preloader";
 import Testimonials from "./Components/Testimonials";
+import Pricing from "./Components/Pricing";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { AuthProvider } from "./Components/AuthContext";
@@ -163,6 +164,10 @@ function App() {
 
         <div id="content">
           <Content />
+        </div>
+
+        <div id="Pricing">
+          <Pricing />
         </div>
 
         <div id="socialMediaPosts">
