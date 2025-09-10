@@ -88,13 +88,10 @@ const BusinessCardsSection = () => {
 
   // Business card posts
   const featured = [
-    { src: card1, title: "Business Card 1", category: "Print • Business Card" },
-    { src: card2, title: "Business Card 2", category: "Print • Business Card" },
-    { src: card3, title: "Business Card 3", category: "Print • Business Card" },
-    { src: card4, title: "Business Card 4", category: "Print • Business Card" },
-    { src: card5, title: "Business Card 5", category: "Print • Business Card" },
-    { src: card6, title: "Business Card 6", category: "Print • Business Card" },
-    { src: card7, title: "Business Card 7", category: "Print • Business Card" }
+    { src: card4, title: "Business Card 1", category: "Print • Business Card" },
+    { src: card5, title: "Business Card 2", category: "Print • Business Card" },
+    { src: card6, title: "Business Card 3", category: "Print • Business Card" },
+    { src: card7, title: "Business Card 4", category: "Print • Business Card" }
   ];
 
   const morePosts = []; // extend here in the future

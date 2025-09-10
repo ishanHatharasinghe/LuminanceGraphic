@@ -121,8 +121,12 @@ const SocialMediaCoverSection = () => {
     { src: gig1, title: "Cover 8", category: "Social • Cover" },
     { src: gig2, title: "Cover 9", category: "Social • Cover" },
     { src: gig3, title: "Cover 10", category: "Social • Cover" },
+    { src: Image21, title: "Cover 21", category: "Social • Cover" },
+    { src: Image3, title: "Cover 3", category: "Social • Cover" },
+    { src: Image4, title: "Cover 4", category: "Social • Cover" },
     { src: Image1, title: "Cover 1", category: "Social • Cover" },
     { src: Image2, title: "Cover 2", category: "Social • Cover" },
+    { src: Image5, title: "Cover 5", category: "Social • Cover" },
     { src: Image6, title: "Cover 6", category: "Social • Cover" },
     { src: Image7, title: "Cover 7", category: "Social • Cover" },
     { src: Image8, title: "Cover 8", category: "Social • Cover" },
@@ -138,7 +142,13 @@ const SocialMediaCoverSection = () => {
     { src: Image18, title: "Cover 18", category: "Social • Cover" },
     { src: Image19, title: "Cover 19", category: "Social • Cover" },
     { src: Image20, title: "Cover 20", category: "Social • Cover" },
+
+    { src: Image22, title: "Cover 22", category: "Social • Cover" },
+    { src: Image23, title: "Cover 23", category: "Social • Cover" },
+    { src: Image24, title: "Cover 24", category: "Social • Cover" },
+    { src: Image25, title: "Cover 25", category: "Social • Cover" },
     { src: Image26, title: "Cover 26", category: "Social • Cover" },
+    { src: Image27, title: "Cover 27", category: "Social • Cover" },
     { src: Image28, title: "Cover 28", category: "Social • Cover" }
   ];
 
