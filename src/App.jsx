@@ -32,7 +32,6 @@ function App() {
   const [showPopup, setShowPopup] = useState(false);
   const popupRef = useRef(null); // Ref for accessibility
 
-  // Show after preloader finishes, only once per session
   useEffect(() => {
     if (!isLoading) {
       const seen = sessionStorage.getItem("welcomePopupShown");
@@ -55,7 +54,7 @@ function App() {
     });
 
     // Simulate loading time and ensure minimum display duration
-    const minLoadTime = 2500; // Minimum 2.5 seconds
+    const minLoadTime = 500; 
     const startTime = Date.now();
 
     const handleLoad = () => {

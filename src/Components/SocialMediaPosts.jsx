@@ -256,6 +256,17 @@ import NewImage101 from "./../assets/Social Media Posts/new/newimg (101).jpg";
 import NewImage102 from "./../assets/Social Media Posts/new/newimg (102).jpg";
 import NewImage103 from "./../assets/Social Media Posts/new/newimg (103).jpg";
 import NewImage104 from "./../assets/Social Media Posts/new/newimg (104).jpg";
+import April20261 from "../assets/Social Media Posts/April2026 (1).webp";
+import April20262 from "../assets/Social Media Posts/April2026 (2).webp";
+import April20263 from "../assets/Social Media Posts/April2026 (3).webp";
+import April20264 from "../assets/Social Media Posts/April2026 (4).webp";
+import April20265 from "../assets/Social Media Posts/April2026 (5).webp";
+import April20266 from "../assets/Social Media Posts/April2026 (6).webp";
+import April20267 from "../assets/Social Media Posts/April2026 (7).webp";
+import April20268 from "../assets/Social Media Posts/April2026 (8).webp";
+import April20269 from "../assets/Social Media Posts/April2026 (9).webp";
+import April202610 from "../assets/Social Media Posts/April2026 (10).webp";
+import April202611 from "../assets/Social Media Posts/April2026 (11).webp";
 
 // Theme (matches Home)
 const COLORS = {
@@ -368,6 +379,7 @@ const SocialMediaPostsSection = () => {
   // FIXED: Complete morePostsSources array with ALL imported images
   const morePostsSources = [
     // All upper images
+    April20261,April20262,April20263,April20264,April20265,April20266,April20267,April20268,April20269,April202610,April202611,
     Image1,
     Image2,
     Image3,
