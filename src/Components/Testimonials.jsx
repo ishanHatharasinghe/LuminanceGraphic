@@ -135,19 +135,57 @@ const TestimonialsSection = () => {
   };
 
   useEffect(() => {
+    console.log("🔧 Testimonials component mounted, initializing Firebase listener...");
+    
     const testimonialsRef = ref(db, "testimonials");
-    onValue(testimonialsRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const result = Object.entries(data)
-          .map(([id, value]) => ({ id, ...value }))
-          .sort((a, b) => new Date(b.dateAndTime) - new Date(a.dateAndTime));
-        setTestimonials(result);
-      } else {
+    console.log("📍 Testimonials reference created:", testimonialsRef);
+    
+    // Test database connection first
+    console.log("🔍 Testing database connection...");
+    
+    const unsubscribe = onValue(
+      testimonialsRef,
+      (snapshot) => {
+        console.log("📥 Firebase snapshot received:", snapshot.val());
+        const data = snapshot.val();
+        if (data) {
+          const result = Object.entries(data)
+            .map(([id, value]) => ({ id, ...value }))
+            .sort(
+              (a, b) => new Date(b.dateAndTime) - new Date(a.dateAndTime)
+            );
+          console.log("✅ Testimonials loaded successfully:", result);
+          setTestimonials(result);
+        } else {
+          console.log("📭 No testimonials found in database");
+          setTestimonials([]);
+        }
+        setIsLoading(false);
+      },
+      (error) => {
+        console.error("❌ Error fetching testimonials:", error);
+        console.error("❌ Error details:", {
+          code: error.code,
+          message: error.message,
+          stack: error.stack
+        });
         setTestimonials([]);
+        setIsLoading(false);
       }
+    );
+
+    // Timeout fallback - if loading takes more than 10 seconds, stop loading
+    const timeoutId = setTimeout(() => {
+      console.warn("⏰ Testimonials loading timed out after 10 seconds");
       setIsLoading(false);
-    });
+      setTestimonials([]);
+    }, 10000);
+
+    return () => {
+      console.log("🧹 Cleaning up Firebase listener");
+      unsubscribe();
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   // Auto-fill email when user logs in
@@ -163,16 +201,29 @@ const TestimonialsSection = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      await signInWithPopup(auth, provider);
+      console.log("🔐 Attempting Google login...");
+      const result = await signInWithPopup(auth, provider);
+      console.log("✅ Google login successful:", result.user);
       setError("");
     } catch (error) {
+      console.error("❌ Google login error:", error);
+      console.error("❌ Error details:", {
+        code: error.code,
+        message: error.message,
+        stack: error.stack
+      });
+      
       if (
         error.code === "auth/popup-closed-by-user" ||
         error.code === "auth/cancelled-popup-request"
       ) {
         setError("Login cancelled. Please try again.");
+      } else if (error.code === "auth/popup-blocked") {
+        setError("Popup blocked. Please allow popups for this site and try again.");
+      } else if (error.code === "auth/unauthorized-domain") {
+        setError("Unauthorized domain. Please check Firebase console configuration.");
       } else {
-        setError("Failed to login. Please try again.");
+        setError(`Failed to login: ${error.message}`);
       }
     }
   };
@@ -333,6 +384,34 @@ const TestimonialsSection = () => {
       <div className="min-h-screen flex items-center justify-center bg-[#0A0B0D]">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#B08B57]"></div>
       </div>
+    );
+  }
+
+  // If we have an error state, show a message
+  if (error && testimonials.length === 0) {
+    return (
+      <section
+        id="testimonials"
+        ref={sectionRef}
+        onMouseMove={onMouseMove}
+        className="relative min-h-screen overflow-hidden text-[#E7DFD6] bg-[#0A0B0D]"
+      >
+        <div className="relative max-w-7xl mx-auto px-6 py-24 md:py-32">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold mb-6">Client Testimonials</h1>
+            <div className="bg-red-900/30 text-red-300 p-6 rounded-xl border border-red-500/20 backdrop-blur-sm max-w-md mx-auto">
+              <p className="mb-4">Unable to load testimonials at this time.</p>
+              <p className="text-sm text-red-400/80">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-4 px-6 py-2 bg-[#B08B57] text-[#0A0B0D] rounded-lg hover:bg-[#C89B67] transition-colors"
+              >
+                Reload Page
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
     );
   }
 

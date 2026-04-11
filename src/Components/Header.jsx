@@ -55,7 +55,6 @@ const Navbar = () => {
         "Bookmark",
         "Banner",
         "Pricing",
-        "testimonials",
         "contact"
       ];
 
@@ -111,8 +110,7 @@ const Navbar = () => {
     { id: "home", label: "Home", icon: RiHomeWifiFill },
     { id: "about", label: "About", icon: FileText },
     { id: "content", label: "Content", icon: Grid3X3 },
-    { id: "Pricing", label: "Pricing", icon: DollarSign },
-    { id: "testimonials", label: "Testimonials", icon: MessageSquare }
+    { id: "Pricing", label: "Pricing", icon: DollarSign }
   ];
 
   const portfolioItems = [
