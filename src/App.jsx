@@ -19,7 +19,6 @@ import CV from "./Components/CVdesigns";
 import Bookmark from "./Components/Bookmark";
 import Banner from "./Components/Banner";
 import Preloader from "./Components/Preloader";
-import Testimonials from "./Components/Testimonials";
 import Pricing from "./Components/Pricing";
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -209,9 +208,6 @@ function App() {
           <Banner />
         </div>
 
-        <AuthProvider>
-          <Testimonials id="Testimonials" />
-        </AuthProvider>
 
         <div id="contact">
           <Contact />
