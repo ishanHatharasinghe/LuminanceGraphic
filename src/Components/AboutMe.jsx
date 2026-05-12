@@ -59,7 +59,7 @@ const SocialIcon = ({ type, className = "w-5 h-5" }) => {
 // Reusable card for each team member
 const TeamMemberCard = ({ member, index = 0 }) => {
   return (
-    <div
+    <motion.div
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.3 }}
@@ -70,6 +70,7 @@ const TeamMemberCard = ({ member, index = 0 }) => {
       }}
       whileHover={{ y: -6 }}
       className="group relative rounded-2xl p-[1px] bg-gradient-to-br from-white/10 via-white/5 to-transparent ring-1 ring-white/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] overflow-hidden"
+      style={{ position: "relative" }}
     >
       <div className="relative h-full rounded-2xl bg-[#141518]/50 backdrop-blur-xl p-6">
         {/* Decorative soft glow */}
@@ -213,7 +214,7 @@ const TeamMemberCard = ({ member, index = 0 }) => {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -283,6 +284,7 @@ const About = () => {
       onMouseMove={handleMouseMove}
       className="relative min-h-screen overflow-hidden text-[#E7DFD6] flex items-center"
       style={{
+        position: "relative",
         paddingTop: "4rem",
         paddingBottom: "3rem",
         background:

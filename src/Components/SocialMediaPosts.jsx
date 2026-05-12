@@ -94,6 +94,62 @@ const ChevronDownIcon = ({ className }) => (
     />
   </svg>
 );
+const CloseIcon = ({ className }) => (
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M6 18L18 6M6 6l12 12"
+    />
+  </svg>
+);
+
+const LazyImage = ({ imageData, alt, onClick }) => {
+  const [src, setSrc] = useState(null);
+  useEffect(() => {
+    let cancelled = false;
+    imageData.importer().then((module) => {
+      if (!cancelled) {
+        setSrc(module.default || module);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [imageData]);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group relative overflow-hidden rounded-2xl bg-[#141518]/40 ring-1 ring-white/10 transition hover:ring-[#B08B57]/30"
+      aria-label={alt}
+    >
+      <div className="aspect-square bg-[#0A0B0D]/70">
+        {src ? (
+          <img
+            src={src}
+            alt={alt}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+            loading="lazy"
+            decoding="async"
+            draggable="false"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center text-xs text-[#E7DFD6]/60">
+            Loading…
+          </div>
+        )}
+      </div>
+    </button>
+  );
+};
 // Lazy Overlay Image Component
 const LazyOverlayImage = ({ post, isActive, style, onLoad }) => {
   const [src, setSrc] = useState(null);
@@ -176,6 +232,7 @@ const SocialMediaPostsSection = () => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [loadedImages, setLoadedImages] = useState(new Map());
+  const [showMore, setShowMore] = useState(false);
   const imagesPerPage = 20; // Load 20 images at a time
 
   // Lazy load image function
@@ -244,6 +301,8 @@ const SocialMediaPostsSection = () => {
       totalPages: Math.ceil(subOrdersSources.length / imagesPerPage)
     }
   ];
+
+  const morePosts = gallerySections.flatMap((section) => section.images);
 
   // Flatten all covers for the overlay (lazy loaded)
   const allPosts = gallerySections.flatMap(section =>

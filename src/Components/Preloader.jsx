@@ -12,20 +12,27 @@ const COLORS = {
   peach: "#F1D6BF"
 };
 
-const Preloader = ({ onComplete }) => {
+const Preloader = ({ isVisible = true, onComplete }) => {
   const [progress, setProgress] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
 
   useEffect(() => {
+    if (!isVisible) return undefined;
+
+    setProgress(0);
+    setIsComplete(false);
+
     // Simulate loading progress
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
           setIsComplete(true);
-          // Immediately call onComplete
+          // Immediately call onComplete if provided
           setTimeout(() => {
-            onComplete();
+            if (typeof onComplete === "function") {
+              onComplete();
+            }
           }, 50);
           return 100;
         }
@@ -35,7 +42,11 @@ const Preloader = ({ onComplete }) => {
     }, 15);
 
     return () => clearInterval(interval);
-  }, [onComplete]);
+  }, [isVisible, onComplete]);
+
+  if (!isVisible) {
+    return null;
+  }
 
   return (
     <div

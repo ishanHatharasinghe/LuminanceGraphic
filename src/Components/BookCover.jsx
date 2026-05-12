@@ -75,6 +75,53 @@ const ChevronDownIcon = ({ className }) => (
     />
   </svg>
 );
+
+const LazyBookImage = ({ imageData, alt, onClick, aspectRatio = "aspect-square" }) => {
+  const [src, setSrc] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    imageData.importer().then((module) => {
+      if (!cancelled) {
+        setSrc(module.default || module);
+      }
+    }).catch(() => {
+      if (!cancelled) {
+        setSrc(null);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [imageData]);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group relative overflow-hidden rounded-3xl bg-[#141518]/40 ring-1 ring-white/10 transition hover:ring-[#B08B57]/30"
+      aria-label={alt}
+    >
+      <div className={`w-full ${aspectRatio} bg-[#0A0B0D]/70`}>
+        {src ? (
+          <img
+            src={src}
+            alt={alt}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+            loading="lazy"
+            decoding="async"
+            draggable="false"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center text-xs text-[#E7DFD6]/60">
+            Loading…
+          </div>
+        )}
+      </div>
+    </button>
+  );
+};
+
 // Lazy Overlay Image Component for Book Covers
 const LazyOverlayBookImage = ({ post, isActive, style, onLoad }) => {
   const [src, setSrc] = useState(null);
@@ -146,6 +193,7 @@ const BookCoverSection = () => {
   // Overlay state
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [showMore, setShowMore] = useState(false);
   const [showThumbs, setShowThumbs] = useState(false); // default hidden for compact modal
   const [showHint, setShowHint] = useState(false);
 
