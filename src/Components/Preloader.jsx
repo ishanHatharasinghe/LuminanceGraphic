@@ -23,16 +23,16 @@ const Preloader = ({ onComplete }) => {
         if (prev >= 100) {
           clearInterval(interval);
           setIsComplete(true);
-          // Delay before calling onComplete to show completion animation
+          // Immediately call onComplete
           setTimeout(() => {
             onComplete();
-          }, 800);
+          }, 50);
           return 100;
         }
         // Random increment for more natural feel
-        return prev + Math.random() * 15 + 5;
+        return prev + Math.random() * 50 + 20;
       });
-    }, 100);
+    }, 15);
 
     return () => clearInterval(interval);
   }, [onComplete]);

@@ -1,22 +1,38 @@
 // src/Components/SocialMediaPostsSection.jsx
 import { useEffect, useRef, useState } from "react";
 
-// Dynamically import all images from each folder
-const mainAreaImages = import.meta.glob("./../assets/Social Media Posts/main area/*.{jpg,jpeg,png,webp}", { eager: true, import: "default" });
-const _2026Images = import.meta.glob("./../assets/Social Media Posts/2026/*.{jpg,jpeg,png,webp}", { eager: true, import: "default" });
-const myDesignsImages = import.meta.glob("./../assets/Social Media Posts/My Designs/*.{jpg,jpeg,png,webp}", { eager: true, import: "default" });
-const subOrdersImages = import.meta.glob("./../assets/Social Media Posts/Sub Orders/*.{jpg,jpeg,png,webp}", { eager: true, import: "default" });
+// Dynamically import all images from each folder (lazy loading)
+const mainAreaImages = import.meta.glob("./../assets/Social Media Posts/main area/*.{jpg,jpeg,png,webp}", { eager: false });
+const _2026Images = import.meta.glob("./../assets/Social Media Posts/2026/*.{jpg,jpeg,png,webp}", { eager: false });
+const myDesignsImages = import.meta.glob("./../assets/Social Media Posts/My Designs/*.{jpg,jpeg,png,webp}", { eager: false });
+const subOrdersImages = import.meta.glob("./../assets/Social Media Posts/Sub Orders/*.{jpg,jpeg,png,webp}", { eager: false });
 
-// Helper to sort and extract values from glob imports
+// Helper to sort and extract values from glob imports (lazy loading)
 const sortImages = (globObj) => {
-  return Object.values(globObj).sort((a, b) => {
-    const numA = parseInt(a.match(/\((\d+)\)/)?.[1] || a.match(/(\d+)\./)?.[1] || "0");
-    const numB = parseInt(b.match(/\((\d+)\)/)?.[1] || b.match(/(\d+)\./)?.[1] || "0");
-    return numA - numB;
-  });
+  const entries = Object.entries(globObj);
+  return entries
+    .map(([path, importer]) => ({
+      path,
+      importer,
+      // Extract number from parentheses first: "lower (1).jpg" -> 1
+      num: parseInt(path.match(/\((\d+)\)/)?.[1] || path.match(/(\d+)/)?.[1] || "0"),
+      prefix: path.match(/^.*\/(upper|lower|newimg)/)?.[1] || ""
+    }))
+    .sort((a, b) => {
+      // If numbers are equal, sort by prefix (lower before upper)
+      if (a.num === b.num) {
+        if (a.prefix === b.prefix) return 0;
+        if (a.prefix === "lower") return -1;
+        if (b.prefix === "lower") return 1;
+        if (a.prefix === "upper") return -1;
+        return 1;
+      }
+      return a.num - b.num;
+    })
+    .map(item => ({ path: item.path, importer: item.importer }));
 };
 
-// Organize images by category
+// Organize images by category (lazy loaded)
 const mainAreaSources = sortImages(mainAreaImages);
 const _2026Sources = sortImages(_2026Images);
 const myDesignsSources = sortImages(myDesignsImages);
@@ -78,16 +94,59 @@ const ChevronDownIcon = ({ className }) => (
     />
   </svg>
 );
-const CloseIcon = ({ className }) => (
-  <svg
-    className={className}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-  >
-    <path strokeWidth="2" strokeLinecap="round" d="M6 6l12 12M6 18L18 6" />
-  </svg>
-);
+// Lazy Overlay Image Component
+const LazyOverlayImage = ({ post, isActive, style, onLoad }) => {
+  const [src, setSrc] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!isActive) return;
+
+    const loadImage = async () => {
+      try {
+        const imageSrc = await post.imageData.importer();
+        setSrc(imageSrc);
+        setIsLoading(false);
+        if (onLoad) onLoad({ currentTarget: { naturalWidth: 800, naturalHeight: 600 } }); // Mock dimensions
+      } catch (error) {
+        console.error('Failed to load overlay image:', post.imageData.path);
+        setIsLoading(false);
+      }
+    };
+
+    loadImage();
+  }, [post.imageData, isActive, onLoad]);
+
+  if (!isActive || !src) {
+    return (
+      <div
+        className={`absolute inset-0 w-full h-full object-contain p-4 md:p-6 transition-opacity duration-300 bg-gray-800 flex items-center justify-center ${
+          isActive ? "opacity-100" : "opacity-0"
+        }`}
+        style={style}
+      >
+        {isActive && isLoading && (
+          <div className="flex items-center justify-center">
+            <div className="w-8 h-8 border-2 border-white/20 border-t-white/60 rounded-full animate-spin"></div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={post.title}
+      className={`absolute inset-0 w-full h-full object-contain p-4 md:p-6 transition-opacity duration-300 ${
+        isActive ? "opacity-100" : "opacity-0"
+      }`}
+      style={style}
+      onLoad={onLoad}
+      draggable="false"
+    />
+  );
+};
 
 const SocialMediaPostsSection = () => {
   const sectionRef = useRef(null);
@@ -114,13 +173,41 @@ const SocialMediaPostsSection = () => {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
 
-  // See more
-  const [showMore, setShowMore] = useState(true);
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loadedImages, setLoadedImages] = useState(new Map());
+  const imagesPerPage = 20; // Load 20 images at a time
+
+  // Lazy load image function
+  const loadImage = async (imageData) => {
+    if (loadedImages.has(imageData.path)) {
+      return loadedImages.get(imageData.path);
+    }
+
+    try {
+      const src = await imageData.importer();
+      setLoadedImages(prev => new Map(prev.set(imageData.path, src)));
+      return src;
+    } catch (error) {
+      console.error('Failed to load image:', imageData.path, error);
+      return null;
+    }
+  };
+
+  // Load images for current page
+  const loadImagesForPage = async (page, sectionImages) => {
+    const startIndex = (page - 1) * imagesPerPage;
+    const endIndex = startIndex + imagesPerPage;
+    const imagesToLoad = sectionImages.slice(startIndex, endIndex);
+
+    // Load images in parallel
+    await Promise.all(imagesToLoad.map(img => loadImage(img)));
+  };
 
   // Collapsible sections state (track which sections are expanded)
   const [expandedSections, setExpandedSections] = useState({
     0: true, // 2026 - expanded
-    1: false, // Our Designs - collapsed on load
+    1: true, // Our Designs - expanded
     2: true // Sub Orders - expanded
   });
 
@@ -138,40 +225,38 @@ const SocialMediaPostsSection = () => {
     category: "Social • Main"
   }));
 
-  // Organize gallery posts by sections
+  // Organize gallery posts by sections with pagination
   const gallerySections = [
     {
       title: "2026",
-      images: _2026Sources.map((src, i) => ({
-        src,
-        title: `2026 ${i + 1}`,
-        category: "Social • 2026"
-      }))
+      images: _2026Sources,
+      totalPages: Math.ceil(_2026Sources.length / imagesPerPage)
     },
     {
       title: "Our Designs",
-      images: myDesignsSources.map((src, i) => ({
-        src,
-        title: `Design ${i + 1}`,
-        category: "Social • Design"
-      }))
+      images: myDesignsSources,
+      totalPages: Math.ceil(myDesignsSources.length / imagesPerPage)
     },
     {
       title: "Sub Orders",
       isSubOrder: true,
-      images: subOrdersSources.map((src, i) => ({
-        src,
-        title: `Order ${i + 1}`,
-        category: "Social • Order"
-      }))
+      images: subOrdersSources,
+      totalPages: Math.ceil(subOrdersSources.length / imagesPerPage)
     }
   ];
 
-  // Flatten all gallery posts for the overlay
-  const morePosts = gallerySections.flatMap(section => section.images);
-
-  // All posts for overlay
-  const allPosts = [...featured, ...morePosts];
+  // Flatten all covers for the overlay (lazy loaded)
+  const allPosts = gallerySections.flatMap(section =>
+    section.images.map((imageData, i) => ({
+      imageData,
+      title: section.isSubOrder
+        ? `Order ${i + 1}`
+        : section.title === "Our Designs"
+          ? `Design ${i + 1}`
+          : `${section.title} ${i + 1}`,
+      category: section.isSubOrder ? "Social • Order" : `Social • ${section.title}`
+    }))
+  );
 
   // Spotlight cursor
   const onMouseMove = (e) => {
@@ -182,15 +267,26 @@ const SocialMediaPostsSection = () => {
     setMouse({ x: `${x}%`, y: `${y}%` });
   };
 
-  // In-view header animation
+  // Load images when component mounts or page changes
   useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
-      { threshold: 0.2 }
-    );
-    if (sectionRef.current) obs.observe(sectionRef.current);
-    return () => obs.disconnect();
+    const loadInitialImages = async () => {
+      // Load first page of each section
+      for (const section of gallerySections) {
+        if (section.images.length > 0) {
+          await loadImagesForPage(1, section.images);
+        }
+      }
+    };
+    loadInitialImages();
   }, []);
+
+  // Load images when page changes
+  useEffect(() => {
+    const currentSection = gallerySections.find(s => s.title === "Our Designs");
+    if (currentSection) {
+      loadImagesForPage(currentPage, currentSection.images);
+    }
+  }, [currentPage]);
 
   // Overlay controls
   const openOverlay = (globalIndex) => {
@@ -534,28 +630,43 @@ const SocialMediaPostsSection = () => {
                   {(isExpanded || !isLargeSection) && (
                     <div className="rounded-2xl p-4 md:p-5 bg-white/5 backdrop-blur-xl ring-1 ring-white/10 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)] transition-opacity duration-300">
                       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2 md:gap-3">
-                        {section.images.map((p, i) => {
-                          const globalIndex = sectionStartIndex + i;
-                          return (
-                            <button
-                              key={`more-${sectionIndex}-${i}`}
-                              onClick={() => openOverlay(globalIndex)}
-                              className="relative overflow-hidden rounded-lg aspect-square ring-1 ring-white/10 hover:ring-white/20 transition group"
-                              aria-label={`Open ${p.title}`}
-                            >
-                              <img
-                                src={p.src}
-                                alt={p.title}
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                                loading="lazy"
-                                decoding="async"
-                                draggable="false"
+                        {section.images
+                          .slice(0, currentPage * imagesPerPage)
+                          .map((imageData, i) => {
+                            const globalIndex = sectionStartIndex + i;
+                            const title = section.isSubOrder
+                              ? `Order ${i + 1}`
+                              : section.title === "Our Designs"
+                                ? `Design ${i + 1}`
+                                : `${section.title} ${i + 1}`;
+
+                            return (
+                              <LazyImage
+                                key={`more-${sectionIndex}-${i}`}
+                                imageData={imageData}
+                                alt={title}
+                                onClick={() => openOverlay(globalIndex)}
+                                index={i}
                               />
-                              <div className="absolute inset-0 bg-[#0A0B0D]/0 group-hover:bg-[#0A0B0D]/10 transition-colors" />
-                            </button>
-                          );
-                        })}
+                            );
+                          })}
                       </div>
+
+                      {/* Load More Button */}
+                      {section.images.length > currentPage * imagesPerPage && (
+                        <div className="mt-6 flex justify-center">
+                          <button
+                            onClick={() => {
+                              const nextPage = currentPage + 1;
+                              setCurrentPage(nextPage);
+                              loadImagesForPage(nextPage, section.images);
+                            }}
+                            className="inline-flex items-center gap-2 rounded-full bg-white/10 hover:bg-white/15 text-[#E7DFD6] px-4 py-2 ring-1 ring-white/10 transition text-sm"
+                          >
+                            Load More ({Math.min(imagesPerPage, section.images.length - currentPage * imagesPerPage)} images)
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -609,7 +720,7 @@ const SocialMediaPostsSection = () => {
 
                 <div className="flex items-center gap-2">
                   <a
-                    href={allPosts[activeIndex].src}
+                    href={loadedImages.get(allPosts[activeIndex]?.imageData?.path) || '#'}
                     download
                     className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/10 hover:bg-white/15 text-[#E7DFD6] ring-1 ring-white/10 transition"
                     title="Download"
@@ -670,13 +781,10 @@ const SocialMediaPostsSection = () => {
               >
                 {/* Active image with zoom/pan */}
                 {allPosts.map((p, idx) => (
-                  <img
+                  <LazyOverlayImage
                     key={`viewer-${idx}`}
-                    src={p.src}
-                    alt={p.title}
-                    className={`absolute inset-0 w-full h-full object-contain p-4 md:p-6 transition-opacity duration-300 ${
-                      idx === activeIndex ? "opacity-100" : "opacity-0"
-                    }`}
+                    post={p}
+                    isActive={idx === activeIndex}
                     style={
                       idx === activeIndex
                         ? {
@@ -688,12 +796,11 @@ const SocialMediaPostsSection = () => {
                     onLoad={(e) => {
                       if (idx === activeIndex) {
                         imgMetaRef.current = {
-                          w: e.currentTarget.naturalWidth || 0,
-                          h: e.currentTarget.naturalHeight || 0
+                          w: e.currentTarget.naturalWidth || 800,
+                          h: e.currentTarget.naturalHeight || 600
                         };
                       }
                     }}
-                    draggable="false"
                   />
                 ))}
 

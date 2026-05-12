@@ -2,16 +2,20 @@
 import { useEffect, useRef, useState } from "react";
 
 // Dynamically import all images from each project folder
-const mainCoversImages = import.meta.glob("./../assets/Book Cover/books*.jpg", { eager: true, import: "default" });
-const heesaraTuteImages = import.meta.glob("./../assets/Book Cover/2026 Sathira Heesara Tute Covers Project/*.jpg", { eager: true, import: "default" });
+const mainCoversImages = import.meta.glob("./../assets/Book Cover/books*.jpg", { eager: false });
+const heesaraTuteImages = import.meta.glob("./../assets/Book Cover/2026 Sathira Heesara Tute Covers Project/*.jpg", { eager: false });
 
-// Helper to sort and extract values from glob imports
+// Helper to sort and extract values from glob imports (lazy loading)
 const sortImages = (globObj) => {
-  return Object.values(globObj).sort((a, b) => {
-    const numA = parseInt(a.match(/\((\d+)\)/)?.[1] || a.match(/(\d+)\./)?.[1] || "0");
-    const numB = parseInt(b.match(/\((\d+)\)/)?.[1] || b.match(/(\d+)\./)?.[1] || "0");
-    return numA - numB;
-  });
+  const entries = Object.entries(globObj);
+  return entries
+    .map(([path, importer]) => ({
+      path,
+      importer,
+      num: parseInt(path.match(/\((\d+)\)/)?.[1] || path.match(/(\d+)\./)?.[1] || "0")
+    }))
+    .sort((a, b) => a.num - b.num)
+    .map(item => ({ path: item.path, importer: item.importer }));
 };
 
 // Organize images by project
@@ -71,16 +75,59 @@ const ChevronDownIcon = ({ className }) => (
     />
   </svg>
 );
-const CloseIcon = ({ className }) => (
-  <svg
-    className={className}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-  >
-    <path strokeWidth="2" strokeLinecap="round" d="M6 6l12 12M6 18L18 6" />
-  </svg>
-);
+// Lazy Overlay Image Component for Book Covers
+const LazyOverlayBookImage = ({ post, isActive, style, onLoad }) => {
+  const [src, setSrc] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!isActive) return;
+
+    const loadImage = async () => {
+      try {
+        const imageSrc = await post.imageData.importer();
+        setSrc(imageSrc);
+        setIsLoading(false);
+        if (onLoad) onLoad({ currentTarget: { naturalWidth: 600, naturalHeight: 800 } }); // Mock book dimensions
+      } catch (error) {
+        console.error('Failed to load book cover overlay image:', post.imageData.path);
+        setIsLoading(false);
+      }
+    };
+
+    loadImage();
+  }, [post.imageData, isActive, onLoad]);
+
+  if (!isActive || !src) {
+    return (
+      <div
+        className={`absolute inset-0 w-full h-full object-contain p-3 md:p-4 transition-opacity duration-200 bg-gray-800 flex items-center justify-center ${
+          isActive ? "opacity-100" : "opacity-0"
+        }`}
+        style={style}
+      >
+        {isActive && isLoading && (
+          <div className="flex items-center justify-center">
+            <div className="w-8 h-8 border-2 border-white/20 border-t-white/60 rounded-full animate-spin"></div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={post.title}
+      className={`absolute inset-0 w-full h-full object-contain p-3 md:p-4 transition-opacity duration-200 ${
+        isActive ? "opacity-100" : "opacity-0"
+      }`}
+      style={style}
+      onLoad={onLoad}
+      draggable="false"
+    />
+  );
+};
 
 const BookCoverSection = () => {
   const sectionRef = useRef(null);
@@ -107,8 +154,35 @@ const BookCoverSection = () => {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
 
-  // See more
-  const [showMore, setShowMore] = useState(true);
+  // Lazy loading state
+  const [loadedImages, setLoadedImages] = useState(new Map());
+  const [currentPage, setCurrentPage] = useState(1);
+  const imagesPerPage = 12; // Load 12 images at a time for book covers
+
+  // Lazy load image function
+  const loadImage = async (imageData) => {
+    if (loadedImages.has(imageData.path)) {
+      return loadedImages.get(imageData.path);
+    }
+
+    try {
+      const src = await imageData.importer();
+      setLoadedImages(prev => new Map(prev.set(imageData.path, src)));
+      return src;
+    } catch (error) {
+      console.error('Failed to load book cover image:', imageData.path, error);
+      return null;
+    }
+  };
+
+  // Load images for current page
+  const loadImagesForPage = async (page, sectionImages) => {
+    const startIndex = (page - 1) * imagesPerPage;
+    const endIndex = startIndex + imagesPerPage;
+    const imagesToLoad = sectionImages.slice(startIndex, endIndex);
+
+    await Promise.all(imagesToLoad.map(img => loadImage(img)));
+  };
 
   // Collapsible sections state
   const [expandedSections, setExpandedSections] = useState({
@@ -123,40 +197,40 @@ const BookCoverSection = () => {
     }));
   };
 
-  // Main featured covers (first 6)
-  const mainFeatured = mainCoversSources.slice(0, 6).map((src, i) => ({
-    src,
+  const mainFeatured = mainCoversSources.slice(0, 6).map((imageData, i) => ({
+    imageData,
     title: `Book Cover ${i + 1}`,
     category: "Editorial • Cover",
     project: "Main"
   }));
 
-  // Organize projects by sections
+  // Organize projects by sections with pagination
   const projectSections = [
     {
       title: "Classic Covers",
       category: "Editorial • Cover",
-      images: mainCoversSources.map((src, i) => ({
-        src,
-        title: `Book Cover ${i + 1}`,
-        category: "Editorial • Cover",
-        project: "Main"
-      }))
+      images: mainCoversSources,
+      totalPages: Math.ceil(mainCoversSources.length / imagesPerPage)
     },
     {
       title: "2026 Sathira Heesara Tute",
       category: "Educational • Cover",
-      images: heesaraTuteSources.map((src, i) => ({
-        src,
-        title: `Heesara Tute ${i + 1}`,
-        category: "Educational • Cover",
-        project: "2026"
-      }))
+      images: heesaraTuteSources,
+      totalPages: Math.ceil(heesaraTuteSources.length / imagesPerPage)
     }
   ];
 
-  // Flatten all covers for the overlay
-  const allPosts = projectSections.flatMap(section => section.images);
+  // Flatten all covers for the overlay (lazy loaded)
+  const allPosts = projectSections.flatMap(section =>
+    section.images.map((imageData, i) => ({
+      imageData,
+      title: section.title === "Classic Covers"
+        ? `Book Cover ${i + 1}`
+        : `Heesara Tute ${i + 1}`,
+      category: section.category,
+      project: section.title === "Classic Covers" ? "Main" : "2026"
+    }))
+  );
 
   // Featured covers (for the main grid)
   const featured = mainFeatured;
@@ -171,16 +245,19 @@ const BookCoverSection = () => {
     setMouse({ x: `${x}%`, y: `${y}%` });
   };
 
-  // In-view header animation
+  // Load initial images
   useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
-      {
-        threshold: 0.2
+    const loadInitialImages = async () => {
+      // Load first page of main covers
+      if (mainCoversSources.length > 0) {
+        await loadImagesForPage(1, mainCoversSources);
       }
-    );
-    if (sectionRef.current) obs.observe(sectionRef.current);
-    return () => obs.disconnect();
+      // Load first page of heesara tute covers
+      if (heesaraTuteSources.length > 0) {
+        await loadImagesForPage(1, heesaraTuteSources);
+      }
+    };
+    loadInitialImages();
   }, []);
 
   // Overlay controls
@@ -410,41 +487,13 @@ const BookCoverSection = () => {
         {/* Featured Grid (portrait covers) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
           {featured.map((p, i) => (
-            <button
+            <LazyBookImage
               key={`cover-feat-${i}`}
+              imageData={p.imageData}
+              alt={p.title}
               onClick={() => openOverlay(i)}
-              className="group relative rounded-2xl p-[1px] bg-gradient-to-br from-white/10 via-white/5 to-transparent ring-1 ring-white/10 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.7)] hover:shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] transition-all duration-500 text-left"
-            >
-              <div className="relative rounded-2xl bg-[#141518]/40 backdrop-blur-xl overflow-hidden">
-                <div className="absolute inset-0 opacity-60 bg-gradient-to-tr from-[#B08B57]/10 via-transparent to-[#F1D6BF]/10 -z-10" />
-                <div className="relative overflow-hidden">
-                  <div className="w-full aspect-[4/5]">
-                    <img
-                      src={p.src}
-                      alt={p.title}
-                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-                      loading="lazy"
-                      decoding="async"
-                      draggable="false"
-                    />
-                  </div>
-                </div>
-
-                <div className="absolute inset-x-0 bottom-0 p-4">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#B08B57] animate-pulse" />
-                    <span className="text-xs text-[#B08B57] font-medium">
-                      {p.category}
-                    </span>
-                  </div>
-                  <h3 className="mt-1 text-base md:text-lg font-semibold text-[#E7DFD6]">
-                    {p.title}
-                  </h3>
-                </div>
-
-                <div className="absolute inset-0 bg-[#0A0B0D]/0 group-hover:bg-[#0A0B0D]/10 transition-colors duration-500" />
-              </div>
-            </button>
+              index={i}
+            />
           ))}
         </div>
 
@@ -512,30 +561,42 @@ const BookCoverSection = () => {
                       {(isExpanded || section.images.length <= 12) && (
                         <div className="rounded-2xl p-3 md:p-4 bg-white/5 backdrop-blur-xl ring-1 ring-white/10 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)] transition-opacity duration-300">
                           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-8 gap-2 md:gap-2">
-                            {section.images.map((p, i) => {
-                              const globalIndex = sectionStartIndex + i;
-                              return (
-                                <button
-                                  key={`cover-${sectionIndex}-${i}`}
-                                  onClick={() => openOverlay(globalIndex)}
-                                  className="relative overflow-hidden rounded-xl ring-1 ring-white/10 hover:ring-white/20 transition group"
-                                  aria-label={`Open ${p.title}`}
-                                >
-                                  <div className="w-full aspect-[2/3]">
-                                    <img
-                                      src={p.src}
-                                      alt={p.title}
-                                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                                      loading="lazy"
-                                      decoding="async"
-                                      draggable="false"
-                                    />
-                                  </div>
-                                  <div className="absolute inset-0 bg-[#0A0B0D]/0 group-hover:bg-[#0A0B0D]/10 transition-colors" />
-                                </button>
-                              );
-                            })}
+                            {section.images
+                              .slice(0, currentPage * imagesPerPage)
+                              .map((imageData, i) => {
+                                const globalIndex = sectionStartIndex + i;
+                                const title = section.title === "Classic Covers"
+                                  ? `Book Cover ${i + 1}`
+                                  : `Heesara Tute ${i + 1}`;
+
+                                return (
+                                  <LazyBookImage
+                                    key={`cover-${sectionIndex}-${i}`}
+                                    imageData={imageData}
+                                    alt={title}
+                                    onClick={() => openOverlay(globalIndex)}
+                                    index={i}
+                                    aspectRatio="aspect-[2/3]"
+                                  />
+                                );
+                              })}
                           </div>
+
+                          {/* Load More Button */}
+                          {section.images.length > currentPage * imagesPerPage && (
+                            <div className="mt-6 flex justify-center">
+                              <button
+                                onClick={() => {
+                                  const nextPage = currentPage + 1;
+                                  setCurrentPage(nextPage);
+                                  loadImagesForPage(nextPage, section.images);
+                                }}
+                                className="inline-flex items-center gap-2 rounded-full bg-white/10 hover:bg-white/15 text-[#E7DFD6] px-4 py-2 ring-1 ring-white/10 transition text-sm"
+                              >
+                                Load More ({Math.min(imagesPerPage, section.images.length - currentPage * imagesPerPage)} covers)
+                              </button>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -590,7 +651,7 @@ const BookCoverSection = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <a
-                    href={allPosts[activeIndex].src}
+                    href={loadedImages.get(allPosts[activeIndex]?.imageData?.path) || '#'}
                     download
                     className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/10 hover:bg-white/15 text-[#E7DFD6] ring-1 ring-white/10 transition"
                     title="Download"
@@ -651,13 +712,10 @@ const BookCoverSection = () => {
               >
                 {/* Active image with zoom/pan */}
                 {allPosts.map((p, idx) => (
-                  <img
+                  <LazyOverlayBookImage
                     key={`book-viewer-${idx}`}
-                    src={p.src}
-                    alt={p.title}
-                    className={`absolute inset-0 w-full h-full object-contain p-3 md:p-4 transition-opacity duration-200 ${
-                      idx === activeIndex ? "opacity-100" : "opacity-0"
-                    }`}
+                    post={p}
+                    isActive={idx === activeIndex}
                     style={
                       idx === activeIndex
                         ? {
@@ -669,12 +727,11 @@ const BookCoverSection = () => {
                     onLoad={(e) => {
                       if (idx === activeIndex) {
                         imgMetaRef.current = {
-                          w: e.currentTarget.naturalWidth || 0,
-                          h: e.currentTarget.naturalHeight || 0
+                          w: e.currentTarget.naturalWidth || 600,
+                          h: e.currentTarget.naturalHeight || 800
                         };
                       }
                     }}
-                    draggable="false"
                   />
                 ))}
 

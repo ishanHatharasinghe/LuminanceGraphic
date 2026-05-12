@@ -9,6 +9,9 @@ import flyer4 from "../assets/Flyers/flyre (4).jpg";
 import flyer5 from "../assets/Flyers/flyre (5).jpg";
 import banner3 from "../assets/Banner/Jerry Ayiya 2025 DEC.jpg";
 import flyer6 from "../assets/Flyers/Jerry-Ayiya-2026-JAN.jpg";
+import sathira2026_1 from "../assets/Banner/sathira 2026 (1).jpg";
+import sathira2026_2 from "../assets/Banner/sathira 2026 (2).jpg";
+import sathira2026_3 from "../assets/Banner/sathira 2026 (3).jpg";
 
 const ChevronLeftIcon = ({ className }) => (
   <svg
@@ -136,7 +139,7 @@ const Banner = () => {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
 
   // Data sources
-  const bannerSources = [banner1, banner2, banner3];
+  const bannerSources = [banner1, banner2, banner3, sathira2026_1, sathira2026_2, sathira2026_3];
   const flyerSources = [flyer1, flyer2, flyer3, flyer4, flyer5, flyer6];
 
   const bannerCovers = bannerSources.map((src, i) => ({
