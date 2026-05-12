@@ -1,35 +1,22 @@
 // src/Components/BookCoverSection.jsx
 import { useEffect, useRef, useState } from "react";
 
-import img1 from "./../assets/Book Cover/books (1).jpg";
-import img10 from "./../assets/Book Cover/books (10).jpg";
-import img11 from "./../assets/Book Cover/books (11).jpg";
-import img12 from "./../assets/Book Cover/books (12).jpg";
-import img13 from "./../assets/Book Cover/books (13).jpg";
-import img14 from "./../assets/Book Cover/books (14).jpg";
-import img15 from "./../assets/Book Cover/books (15).jpg";
-import img16 from "./../assets/Book Cover/books (16).jpg";
-import img17 from "./../assets/Book Cover/books (17).jpg";
-import img18 from "./../assets/Book Cover/books (18).jpg";
-import img19 from "./../assets/Book Cover/books (19).jpg";
-import img2 from "./../assets/Book Cover/books (2).jpg";
-import img20 from "./../assets/Book Cover/books (20).jpg";
-import img21 from "./../assets/Book Cover/books (21).jpg";
-import img22 from "./../assets/Book Cover/books (22).jpg";
-import img23 from "./../assets/Book Cover/books (23).jpg";
-import img24 from "./../assets/Book Cover/books (24).jpg";
-import img25 from "./../assets/Book Cover/books (25).jpg";
-import img26 from "./../assets/Book Cover/books (26).jpg";
-import img27 from "./../assets/Book Cover/books (27).jpg";
-import img28 from "./../assets/Book Cover/books (28).jpg";
-import img29 from "./../assets/Book Cover/books (29).jpg";
-import img3 from "./../assets/Book Cover/books (3).jpg";
-import img4 from "./../assets/Book Cover/books (4).jpg";
-import img5 from "./../assets/Book Cover/books (5).jpg";
-import img6 from "./../assets/Book Cover/books (6).jpg";
-import img7 from "./../assets/Book Cover/books (7).jpg";
-import img8 from "./../assets/Book Cover/books (8).jpg";
-import img9 from "./../assets/Book Cover/books (9).jpg";
+// Dynamically import all images from each project folder
+const mainCoversImages = import.meta.glob("./../assets/Book Cover/books*.jpg", { eager: true, import: "default" });
+const heesaraTuteImages = import.meta.glob("./../assets/Book Cover/2026 Sathira Heesara Tute Covers Project/*.jpg", { eager: true, import: "default" });
+
+// Helper to sort and extract values from glob imports
+const sortImages = (globObj) => {
+  return Object.values(globObj).sort((a, b) => {
+    const numA = parseInt(a.match(/\((\d+)\)/)?.[1] || a.match(/(\d+)\./)?.[1] || "0");
+    const numB = parseInt(b.match(/\((\d+)\)/)?.[1] || b.match(/(\d+)\./)?.[1] || "0");
+    return numA - numB;
+  });
+};
+
+// Organize images by project
+const mainCoversSources = sortImages(mainCoversImages);
+const heesaraTuteSources = sortImages(heesaraTuteImages);
 
 // Theme
 const COLORS = {
@@ -121,48 +108,59 @@ const BookCoverSection = () => {
   const [isDragging, setIsDragging] = useState(false);
 
   // See more
-  const [showMore, setShowMore] = useState(false);
+  const [showMore, setShowMore] = useState(true);
 
-  // Ordered covers
-  const covers = [
-    img1,
-    img2,
-    img3,
-    img4,
-    img5,
-    img6,
-    img7,
-    img8,
-    img9,
-    img10,
-    img11,
-    img12,
-    img13,
-    img14,
-    img15,
-    img16,
-    img17,
-    img18,
-    img19,
-    img20,
-    img21,
-    img22,
-    img23,
-    img24,
-    img25,
-    img26,
-    img27,
-    img28,
-    img29
-  ].map((src, i) => ({
+  // Collapsible sections state
+  const [expandedSections, setExpandedSections] = useState({
+    0: true, // Main Covers - expanded
+    1: true  // 2026 Sathira Heesara Tute - expanded
+  });
+
+  const toggleSection = (index) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [index]: !prev[index]
+    }));
+  };
+
+  // Main featured covers (first 6)
+  const mainFeatured = mainCoversSources.slice(0, 6).map((src, i) => ({
     src,
     title: `Book Cover ${i + 1}`,
-    category: "Editorial • Cover"
+    category: "Editorial • Cover",
+    project: "Main"
   }));
 
-  const featured = covers.slice(0, 6);
-  const extras = covers.slice(6);
-  const allPosts = covers;
+  // Organize projects by sections
+  const projectSections = [
+    {
+      title: "Classic Covers",
+      category: "Editorial • Cover",
+      images: mainCoversSources.map((src, i) => ({
+        src,
+        title: `Book Cover ${i + 1}`,
+        category: "Editorial • Cover",
+        project: "Main"
+      }))
+    },
+    {
+      title: "2026 Sathira Heesara Tute",
+      category: "Educational • Cover",
+      images: heesaraTuteSources.map((src, i) => ({
+        src,
+        title: `Heesara Tute ${i + 1}`,
+        category: "Educational • Cover",
+        project: "2026"
+      }))
+    }
+  ];
+
+  // Flatten all covers for the overlay
+  const allPosts = projectSections.flatMap(section => section.images);
+
+  // Featured covers (for the main grid)
+  const featured = mainFeatured;
+  const extras = allPosts.slice(featured.length);
 
   // Spotlight cursor (section)
   const handleSectionMouseMove = (e) => {
@@ -410,17 +408,17 @@ const BookCoverSection = () => {
         </div>
 
         {/* Featured Grid (portrait covers) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
           {featured.map((p, i) => (
             <button
               key={`cover-feat-${i}`}
               onClick={() => openOverlay(i)}
-              className="group relative rounded-2xl p-[1px] bg-gradient-to-br from-white/10 via-white/5 to-transparent ring-1 ring-white/10 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)] hover:shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] transition-all duration-500 text-left"
+              className="group relative rounded-2xl p-[1px] bg-gradient-to-br from-white/10 via-white/5 to-transparent ring-1 ring-white/10 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.7)] hover:shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] transition-all duration-500 text-left"
             >
               <div className="relative rounded-2xl bg-[#141518]/40 backdrop-blur-xl overflow-hidden">
                 <div className="absolute inset-0 opacity-60 bg-gradient-to-tr from-[#B08B57]/10 via-transparent to-[#F1D6BF]/10 -z-10" />
                 <div className="relative overflow-hidden">
-                  <div className="w-full aspect-[2/3]">
+                  <div className="w-full aspect-[4/5]">
                     <img
                       src={p.src}
                       alt={p.title}
@@ -465,45 +463,84 @@ const BookCoverSection = () => {
                   }`}
                 />
                 <span className="text-sm font-medium">
-                  {showMore ? "Show less" : "See more"}
+                  {showMore ? "Show less" : "See more projects"}
                 </span>
               </button>
             </div>
 
+            {/* Project Sections */}
             <div
               className={`mt-6 md:mt-8 overflow-hidden transition-[max-height,opacity,transform] duration-500 ${
                 showMore
-                  ? "max-h-[3000px] opacity-100 translate-y-0"
+                  ? "max-h-[10000px] opacity-100 translate-y-0"
                   : "max-h-0 opacity-0 -translate-y-2"
               }`}
               aria-hidden={!showMore}
             >
-              <div className="rounded-2xl p-4 md:p-5 bg-white/5 backdrop-blur-xl ring-1 ring-white/10 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)]">
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-                  {extras.map((p, i) => {
-                    const globalIndex = featured.length + i;
-                    return (
-                      <button
-                        key={`cover-extra-${i}`}
-                        onClick={() => openOverlay(globalIndex)}
-                        className="relative overflow-hidden rounded-xl ring-1 ring-white/10 hover:ring-white/20 transition group"
-                        aria-label={`Open ${p.title}`}
-                      >
-                        <div className="w-full aspect-[2/3]">
-                          <img
-                            src={p.src}
-                            alt={p.title}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                            loading="lazy"
-                            decoding="async"
-                            draggable="false"
-                          />
+              <div className="space-y-10 md:space-y-12">
+                {projectSections.map((section, sectionIndex) => {
+                  const prevSectionsCount = projectSections
+                    .slice(0, sectionIndex)
+                    .reduce((sum, s) => sum + s.images.length, 0);
+                  const sectionStartIndex = featured.length + prevSectionsCount;
+                  const isExpanded = expandedSections[sectionIndex] !== false;
+
+                  return (
+                    <div key={`project-${sectionIndex}`}>
+                      {/* Section Title with Toggle */}
+                      <div className="mb-4 md:mb-6 flex items-center justify-between">
+                        <div>
+                          <h3 className="text-lg md:text-xl font-semibold text-[#E7DFD6]">
+                            {section.title}
+                          </h3>
+                          <p className="text-xs md:text-sm text-[#E7DFD6]/50 mt-1">
+                            {section.images.length} covers
+                          </p>
                         </div>
-                        <div className="absolute inset-0 bg-[#0A0B0D]/0 group-hover:bg-[#0A0B0D]/10 transition-colors" />
-                      </button>
-                    );
-                  })}
-                </div>
+                        {section.images.length > 12 && (
+                          <button
+                            onClick={() => toggleSection(sectionIndex)}
+                            className="md:hidden inline-flex items-center justify-center px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 text-[#E7DFD6] ring-1 ring-white/10 text-xs font-medium transition"
+                            aria-expanded={isExpanded}
+                          >
+                            {isExpanded ? "Hide" : "Show"}
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Section Grid - Collapsible on Mobile for large sections */}
+                      {(isExpanded || section.images.length <= 12) && (
+                        <div className="rounded-2xl p-3 md:p-4 bg-white/5 backdrop-blur-xl ring-1 ring-white/10 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)] transition-opacity duration-300">
+                          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-8 gap-2 md:gap-2">
+                            {section.images.map((p, i) => {
+                              const globalIndex = sectionStartIndex + i;
+                              return (
+                                <button
+                                  key={`cover-${sectionIndex}-${i}`}
+                                  onClick={() => openOverlay(globalIndex)}
+                                  className="relative overflow-hidden rounded-xl ring-1 ring-white/10 hover:ring-white/20 transition group"
+                                  aria-label={`Open ${p.title}`}
+                                >
+                                  <div className="w-full aspect-[2/3]">
+                                    <img
+                                      src={p.src}
+                                      alt={p.title}
+                                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                                      loading="lazy"
+                                      decoding="async"
+                                      draggable="false"
+                                    />
+                                  </div>
+                                  <div className="absolute inset-0 bg-[#0A0B0D]/0 group-hover:bg-[#0A0B0D]/10 transition-colors" />
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </>

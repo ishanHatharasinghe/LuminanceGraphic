@@ -1,5 +1,4 @@
 // firebase.js
-import { getAnalytics } from "firebase/analytics";
 import { initializeApp } from "firebase/app";
 import {
     getAuth,
@@ -43,15 +42,6 @@ try {
 } catch (error) {
   console.error("❌ Firebase initialization error:", error);
   throw error;
-}
-
-let analytics;
-try {
-  analytics = getAnalytics(app);
-  console.log("✅ Firebase Analytics initialized");
-} catch (error) {
-  console.warn("⚠️ Firebase Analytics initialization warning:", error.message);
-  // Analytics is not critical, so we don't throw
 }
 
 const db = getDatabase(app);

@@ -15,7 +15,6 @@ import {
   FaFlag
 } from "react-icons/fa";
 import AOS from "aos";
-import "aos/dist/aos.css";
 
 const COLORS = {
   marble: "#E7DFD6",

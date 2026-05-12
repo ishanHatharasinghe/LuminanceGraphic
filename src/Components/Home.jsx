@@ -1,8 +1,8 @@
 // src/Components/Home.jsx
 import { useEffect, useRef, useState } from "react";
 import Statue from "../assets/Home Section/marble-greek-goddess-themis-wearing-crown-with-wings.jpg";
-import Image1 from "./../assets/Social Media Posts/upper (14).jpg";
-import Image2 from "./../assets/Social Media Posts/new/newimg (8).jpg";
+import Image1 from "./../assets/Social Media Posts/My Designs/upper (14).jpg";
+import Image2 from "./../assets/Social Media Posts/My Designs/newimg (8).jpg";
 import Image3 from "./../assets/Tshirt Designs/5.jpg";
 
 // Brand colors adjusted for dark theme

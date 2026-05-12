@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import AOS from "aos";
-import "aos/dist/aos.css";
 import { FaRegClock } from "react-icons/fa";
 
 const COLORS = {

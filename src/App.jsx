@@ -1,28 +1,34 @@
-import { useState, useEffect, useRef } from "react"; // Import useRef for accessibility focus
+import { Suspense, lazy, useEffect, useRef, useState } from "react"; // Import lazy + Suspense for section code splitting
 import "./index.css";
 import Header from "./Components/Header";
 import Home from "./Components/Home";
 import AboutMe from "./Components/AboutMe";
-import Content from "./Components/Content";
-import SocialMediaPosts from "./Components/SocialMediaPosts";
-import Logo from "./Components/Logo";
-import YoutubeThumbnails from "./Components/YoutubeThumbnails";
-import SocialMediaCover from "./Components/SocialMediaCover";
-import BookCover from "./Components/BookCover";
 import Contact from "./Components/Contact";
 import Skills from "./Components/Skills";
 import Copyright from "./Components/Copyright";
-import TempHome from "./Components/TempHome";
-import Tdesigns from "./Components/TDesigns";
-import BusinessCarddesigns from "./Components/Businesscard";
-import CV from "./Components/CVdesigns";
-import Bookmark from "./Components/Bookmark";
-import Banner from "./Components/Banner";
 import Preloader from "./Components/Preloader";
-import Pricing from "./Components/Pricing";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { AuthProvider } from "./Components/AuthContext";
+
+const Content = lazy(() => import("./Components/Content"));
+const SocialMediaPosts = lazy(() => import("./Components/SocialMediaPosts"));
+const Logo = lazy(() => import("./Components/Logo"));
+const YoutubeThumbnails = lazy(() => import("./Components/YoutubeThumbnails"));
+const SocialMediaCover = lazy(() => import("./Components/SocialMediaCover"));
+const BookCover = lazy(() => import("./Components/BookCover"));
+const Tdesigns = lazy(() => import("./Components/TDesigns"));
+const BusinessCarddesigns = lazy(() => import("./Components/Businesscard"));
+const CV = lazy(() => import("./Components/CVdesigns"));
+const Bookmark = lazy(() => import("./Components/Bookmark"));
+const Banner = lazy(() => import("./Components/Banner"));
+const Pricing = lazy(() => import("./Components/Pricing"));
+
+const SectionLoader = () => (
+  <div className="min-h-[28vh] flex items-center justify-center text-white/60">
+    Loading section…
+  </div>
+);
 
 import Image1 from "./assets/Home Section/main post.jpg";
 
@@ -138,6 +144,8 @@ function App() {
               src={Image1}
               alt="Welcome"
               className="max-w-[90vw] max-h-[80vh] object-contain rounded-lg shadow-2xl"
+              loading="lazy"
+              decoding="async"
               draggable="false"
             />
           </div>
@@ -161,51 +169,75 @@ function App() {
         </div>
 
         <div id="content">
-          <Content />
+          <Suspense fallback={<SectionLoader />}>
+            <Content />
+          </Suspense>
         </div>
 
         <div id="Pricing">
-          <Pricing />
+          <Suspense fallback={<SectionLoader />}>
+            <Pricing />
+          </Suspense>
         </div>
 
         <div id="socialMediaPosts">
-          <SocialMediaPosts />
+          <Suspense fallback={<SectionLoader />}>
+            <SocialMediaPosts />
+          </Suspense>
         </div>
 
         <div id="logo">
-          <Logo />
+          <Suspense fallback={<SectionLoader />}>
+            <Logo />
+          </Suspense>
         </div>
 
         <div id="youtubeThumbnails">
-          <YoutubeThumbnails />
+          <Suspense fallback={<SectionLoader />}>
+            <YoutubeThumbnails />
+          </Suspense>
         </div>
 
         <div id="socialMediaCover">
-          <SocialMediaCover />
+          <Suspense fallback={<SectionLoader />}>
+            <SocialMediaCover />
+          </Suspense>
         </div>
 
         <div id="bookCover">
-          <BookCover />
+          <Suspense fallback={<SectionLoader />}>
+            <BookCover />
+          </Suspense>
         </div>
 
         <div id="Tdesigns">
-          <Tdesigns />
+          <Suspense fallback={<SectionLoader />}>
+            <Tdesigns />
+          </Suspense>
         </div>
 
         <div id="BusinessCarddesigns">
-          <BusinessCarddesigns />
+          <Suspense fallback={<SectionLoader />}>
+            <BusinessCarddesigns />
+          </Suspense>
         </div>
 
         <div id="CV">
-          <CV />
+          <Suspense fallback={<SectionLoader />}>
+            <CV />
+          </Suspense>
         </div>
 
         <div id="Bookmark">
-          <Bookmark />
+          <Suspense fallback={<SectionLoader />}>
+            <Bookmark />
+          </Suspense>
         </div>
 
         <div id="Banner">
-          <Banner />
+          <Suspense fallback={<SectionLoader />}>
+            <Banner />
+          </Suspense>
         </div>
 
 
